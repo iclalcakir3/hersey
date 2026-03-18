@@ -122,14 +122,14 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
   border-radius:0;height:40px;
 }
 .hobby-row-left{display:flex;align-items:center;gap:4px;width:112px;flex-shrink:0;min-width:0;}
-.hobby-row-emoji{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.hobby-row-emoji{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .hobby-row-info{display:flex;flex-direction:column;min-width:0;}
 .hobby-row-name{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
 .hobby-row-streak{font-size:10px;font-weight:700;color:var(--sub);}
 .hobby-row-dots{display:flex;gap:2px;flex:1;align-items:center;}
 .hobby-row-actions{display:flex;align-items:center;gap:0px;flex-shrink:0;}
 .main-check{
-  width:28px;height:28px;border-radius:7px;
+  width:26px;height:26px;border-radius:6px;
   border:1.5px solid var(--border);background:white;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;transition:all .15s;flex-shrink:0;
@@ -143,15 +143,15 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
 .week-cell{flex:1;display:flex;flex-direction:column;align-items:center;}
 .week-label{display:none;}
 .week-dot{
-  flex:1;min-width:28px;max-width:52px;height:28px;border-radius:4px;
+  flex:1;min-width:26px;max-width:52px;height:26px;border-radius:6px;
   background:var(--border);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   font-size:6px;font-weight:800;color:var(--sub);
   transition:all .15s;
 }
 .week-dot.done{color:#3D1F0A;}
-.week-dot:first-child{border-radius:4px;}
-.week-dot:last-child{border-radius:4px;}
+.week-dot:first-child{border-radius:6px;}
+.week-dot:last-child{border-radius:6px;}
 .week-dot.partial{background:#FFE8B0;}
 
 /* Card footer */
@@ -1077,7 +1077,7 @@ function buildTracker(){
       </div>
       <div class="hobby-row-dots">${dotCells}</div>
       <div class="hobby-row-actions">
-        <div class="main-check ${allDone?"done":""}" style="width:30px;height:30px;font-size:11px;${allDone?`background:${cardBg};filter:brightness(.85)`:`background:white`}" onclick="${checkonclick}">${checkContent||""}</div>
+        <div class="main-check ${allDone?"done":""}" style="width:26px;height:26px;font-size:10px;border-radius:6px;${allDone?`background:${cardBg};filter:brightness(.85)`:`background:white`}" onclick="${checkonclick}">${checkContent||""}</div>
       </div>
     </div>`;
   }).join(""):""}
