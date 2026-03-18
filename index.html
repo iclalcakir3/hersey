@@ -126,7 +126,7 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
 .hobby-row-info{display:flex;flex-direction:column;min-width:0;}
 .hobby-row-name{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
 .hobby-row-streak{font-size:10px;font-weight:700;color:var(--sub);}
-.hobby-row-dots{display:flex;gap:2px;flex:1;align-items:center;}
+.hobby-row-dots{display:flex;gap:0;flex:1;align-items:center;}
 .hobby-row-actions{display:flex;align-items:center;gap:0px;flex-shrink:0;}
 .main-check{
   width:26px;height:26px;border-radius:6px;
@@ -143,15 +143,15 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
 .week-cell{flex:1;display:flex;flex-direction:column;align-items:center;}
 .week-label{display:none;}
 .week-dot{
-  flex:1;min-width:26px;max-width:52px;height:26px;border-radius:6px;
+  flex:1;min-width:26px;max-width:52px;height:26px;border-radius:0;
   background:var(--border);cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   font-size:6px;font-weight:800;color:var(--sub);
   transition:all .15s;
 }
 .week-dot.done{color:#3D1F0A;}
-.week-dot:first-child{border-radius:6px;}
-.week-dot:last-child{border-radius:6px;}
+.week-dot:first-child{border-radius:6px 0 0 6px;}
+.week-dot:last-child{border-radius:0 6px 6px 0;}
 .week-dot.partial{background:#FFE8B0;}
 
 /* Card footer */
