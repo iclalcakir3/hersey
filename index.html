@@ -698,6 +698,8 @@ let ozetAcikYil=null; // yıllık özet açık yıl
 let ozetAcikAy=null; // aylık özet seçili ay (1-12)
 let harcamaFiltre='tumu'; // tumu | bekleyen | odendi
 let harcamaYil=new Date().getFullYear();
+let favAcik=false;
+let hedefDlg=false;
 let harcamaAy=0; // 0 = tüm yıl, 1-12 = ay
 let takipAbonelikPeriyot='aylik'; // aylik | yillik
 let takipForm=null;
@@ -1473,7 +1475,22 @@ function buildKalori(){
     }
 
 
-    if(kiloDlg){
+    if(hedefDlg){
+    html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Kalori Hedefi</div>
+        <div style="margin:16px 0 20px">
+          <input id="hedef-inp" class="field-input" type="number" placeholder="kcal" value="${state.kalori.hedef||2000}" style="font-size:24px;font-weight:800;text-align:center"/>
+        </div>
+        <div class="modal-btns">
+          <button class="save-btn" onclick="hedefKaydet()" style="margin-top:0">Kaydet</button>
+          <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  if(kiloDlg){
       html+=`<div class="modal-overlay" onclick="if(event.target===this){kiloDlg=false;render();}">
         <div class="modal-sheet">
           <div class="modal-handle"></div>
@@ -1506,7 +1523,14 @@ function buildKalori(){
         </div>
       </div>
       <div class="kalori-macros">
-        <div style="font-size:12px;font-weight:600;color:var(--sub);margin-bottom:4px">Hedef: <b style="color:var(--text)">${hedef} kcal</b> · Kalan: <b style="color:${topKal>hedef?'#B03020':'var(--text)'}">${Math.max(0,hedef-topKal)}</b></div>
+        <div style="font-size:12px;font-weight:600;color:var(--sub);margin-bottom:2px;display:flex;align-items:center;gap:5px;cursor:pointer" onclick="setKaloriHedef()">
+          <span style="font-size:13px">🎯</span>
+          <span>Hedef: <b style="color:var(--text)">${hedef} kcal</b></span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--sub);margin-bottom:4px;display:flex;align-items:center;gap:5px">
+          <span style="font-size:13px">🔋</span>
+          <span>Kalan: <b style="color:${topKal>hedef?'#B03020':'var(--text)'}">${Math.max(0,hedef-topKal)}</b></span>
+        </div>
         ${[['protein','#70A888',topProtein],['karb','#C89020',topKarb],['yağ','#C07060',topYag]].map(([n,c,v])=>`
         <div class="macro-row">
           <div class="macro-dot" style="background:${c}"></div>
@@ -1514,9 +1538,6 @@ function buildKalori(){
           <div class="macro-val">${v}g</div>
         </div>`).join('')}
       </div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="setKaloriHedef()" style="flex:1;padding:9px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer">⚙️ Hedef Ayarla</button>
     </div>
   </div>`;
 
@@ -1552,14 +1573,16 @@ function buildKalori(){
         <button onclick="besinKapat()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
       </div>
       <div style="margin-bottom:12px">
-        <div class="field-label">Favorilerden Seç</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        <button onclick="favAcik=!favAcik;render()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:6px">
+          <span>⭐ Favorilerden Seç</span>
+          <span>${favAcik?'▲':'▼'}</span>
+        </button>
+        ${favAcik?`<div style="display:flex;flex-wrap:wrap;gap:4px">
           ${(state.kalori.favoriler||[]).map(f=>`<div class="fav-chip" onclick="favEkle('${kform.ogün}','${f.id}')">${f.emoji} ${esc(f.name)} <span style="color:var(--sub);font-weight:600">${f.kal}kcal</span></div>`).join('')}
-        </div>
+        </div>`:''}
       </div>
-      <div class="field-label" style="margin-bottom:8px">Ya da Manuel Gir</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <input id="b-emoji" class="field-input" placeholder="Emoji" style="font-size:20px;text-align:center" maxlength="2"/>
+      <div class="field-label" style="margin-bottom:8px">Manuel Gir</div>
+      <div style="margin-bottom:8px">
         <input id="b-name" class="field-input" placeholder="İsim"/>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px">
@@ -1605,7 +1628,7 @@ function favEkle(ogün,fid){
   kform=null;saveKalori();render();showToast(f.name+' eklendi ✓');
 }
 function besinKaydet(ogün){
-  const emoji=document.getElementById('b-emoji')?.value||'🍽️';
+  const emoji='🍽️';
   const name=document.getElementById('b-name')?.value?.trim()||'';
   const kal=parseInt(document.getElementById('b-kal')?.value)||0;
   const protein=parseInt(document.getElementById('b-pro')?.value)||0;
@@ -1642,9 +1665,11 @@ function kiloKaydet(){
   kiloDlg=false;saveKalori();render();showToast('Kilo kaydedildi ✓');
 }
 function setBsv(v){bsv=v;render();}
-function setKaloriHedef(){
-  const v=parseInt(prompt('Günlük kalori hedefin kaç kcal?',state.kalori.hedef||2000));
-  if(v&&v>0){state.kalori.hedef=v;saveKalori();render();showToast('Hedef güncellendi ✓');}
+function setKaloriHedef(){hedefDlg=true;render();}
+function hedefKaydet(){
+  const v=parseInt(document.getElementById('hedef-inp')?.value);
+  if(v&&v>0){state.kalori.hedef=v;saveKalori();showToast('Hedef güncellendi ✓');}
+  hedefDlg=false;render();
 }
 
 
@@ -2772,10 +2797,7 @@ function buildTakip(){
         ${tumYillar.length===0?`<div style="font-size:13px;color:var(--sub);padding:8px 0">Henüz harcama yok</div>`:''}
         ${tumYillar.map(y=>`<button onclick="harcamaYil=${y};harcamaAy=0;render()" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid ${harcamaYil===y?cfg.renk:'var(--border)'};background:${harcamaYil===y?cfg.renk:'var(--bg)'};color:${harcamaYil===y?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${y}</button>`).join('')}
       </div>
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px">
-        <button onclick="harcamaAy=0;render()" style="grid-column:span 2;padding:6px 4px;border-radius:10px;border:1.5px solid ${harcamaAy===0?cfg.renk:'var(--border)'};background:${harcamaAy===0?cfg.renk+'18':'transparent'};color:${harcamaAy===0?cfg.renk:'var(--sub)'};font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Tümü</button>
-        ${['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'].map((a,i)=>`<button onclick="harcamaAy=${i+1};render()" style="padding:6px 2px;border-radius:10px;border:1.5px solid ${harcamaAy===i+1?cfg.renk:'var(--border)'};background:${harcamaAy===i+1?cfg.renk+'18':'transparent'};color:${harcamaAy===i+1?cfg.renk:'var(--sub)'};font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer">${a}</button>`).join('')}
-      </div>
+
     </div>`;
 
     // Özet kart - ödendi/bekleyen ayrımıyla
