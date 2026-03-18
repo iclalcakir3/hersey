@@ -1596,13 +1596,13 @@ function buildKalori(){
 
   if(kform){
     const ogünLabel={'sabah':'Sabah','ogle':'Öğle','aksam':'Akşam','atistirma':'Atıştırmalık'}[kform.ogün];
-    html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){besinKapat();}">
-      <div style="background:var(--card);border-radius:20px;padding:20px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){besinSonuclar=[];besinKapat();}">
+      <div style="background:var(--card);border-radius:20px;padding:20px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.2)" onclick="if(besinSonuclar.length){besinSonuclar=[];render();}">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div style="font-size:15px;font-weight:800;color:var(--text)">${ogünLabel} · Besin Ekle</div>
           <button onclick="besinKapat()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
         </div>
-        <button onclick="favDlg=true;favArama='';render()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:10px">
+        <button onclick="event.stopPropagation();favDlg=true;favArama='';render()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:10px">
           <span>⭐ Favorilerden Seç</span>
           <span>›</span>
         </button>
@@ -1611,7 +1611,7 @@ function buildKalori(){
           <input id="besin-ara-inp" class="field-input" placeholder="örn. yumurta, tavuk..." value="${besinArama}" oninput="besinArama=this.value" onkeydown="if(event.key==='Enter'){besinAra()}" style="flex:1"/>
           <button onclick="besinAra()" style="padding:10px 14px;border-radius:12px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${besinArıyor?'...':'Ara'}</button>
         </div>
-        ${besinSonuclar.length?`<div style="max-height:160px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px">
+        ${besinSonuclar.length?`<div style="max-height:160px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px" onclick="event.stopPropagation()">
           ${besinSonuclar.map((s,i)=>`<div onclick="besinSec(${i})" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div>
               <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(s.name)}</div>
