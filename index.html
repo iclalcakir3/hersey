@@ -355,18 +355,18 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
 
 /* ── KALORI ── */
 .kalori-hero{
-  background:var(--card);border-radius:20px;padding:20px;
+  background:var(--card);border-radius:20px;padding:14px;
   margin-bottom:12px;border:1.5px solid var(--border);
 }
-.kalori-ring-wrap{display:flex;align-items:center;gap:20px;margin-bottom:16px;}
-.kalori-ring{position:relative;width:90px;height:90px;flex-shrink:0;}
+.kalori-ring-wrap{display:flex;align-items:stretch;gap:16px;margin-bottom:16px;}
+.kalori-ring{position:relative;width:90px;height:90px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .kalori-ring svg{width:90px;height:90px;transform:rotate(-90deg);}
 .kalori-ring-bg{fill:none;stroke:var(--border);stroke-width:8;}
 .kalori-ring-fill{fill:none;stroke:#D07060;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s;}
 .kalori-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .kalori-ring-num{font-size:18px;font-weight:800;color:var(--text);line-height:1;}
 .kalori-ring-lbl{font-size:9px;font-weight:600;color:var(--sub);text-transform:uppercase;}
-.kalori-macros{flex:1;display:flex;flex-direction:column;gap:8px;}
+.kalori-macros{flex:1;display:flex;flex-direction:column;gap:4px;justify-content:space-between;}
 .macro-row{display:flex;align-items:center;gap:8px;}
 .macro-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .macro-name{font-size:12px;font-weight:600;color:var(--sub);flex:1;}
@@ -1330,6 +1330,19 @@ function buildKalori(){
       <div style="margin-top:16px;font-size:13px;font-weight:600;color:var(--sub)">Günlük hedef: <b style="color:var(--text)">${suHedef} bardak (${suHedef*250}ml)</b></div>
     </div>`;
     html+=`<div style="height:20px"></div>`;
+    if(hedefDlg)html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Kalori Hedefi</div>
+        <div style="margin:16px 0 20px">
+          <input id="hedef-inp" class="field-input" type="number" placeholder="kcal" value="${state.kalori.hedef||2000}" style="font-size:24px;font-weight:800;text-align:center"/>
+        </div>
+        <div class="modal-btns">
+          <button class="save-btn" onclick="hedefKaydet()" style="margin-top:0">Kaydet</button>
+          <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
+        </div>
+      </div>
+    </div>`;
     return html;
   }
 
@@ -1475,21 +1488,6 @@ function buildKalori(){
     }
 
 
-    if(hedefDlg){
-    html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
-      <div class="modal-sheet">
-        <div class="modal-handle"></div>
-        <div class="modal-title">Kalori Hedefi</div>
-        <div style="margin:16px 0 20px">
-          <input id="hedef-inp" class="field-input" type="number" placeholder="kcal" value="${state.kalori.hedef||2000}" style="font-size:24px;font-weight:800;text-align:center"/>
-        </div>
-        <div class="modal-btns">
-          <button class="save-btn" onclick="hedefKaydet()" style="margin-top:0">Kaydet</button>
-          <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
-        </div>
-      </div>
-    </div>`;
-  }
   if(kiloDlg){
       html+=`<div class="modal-overlay" onclick="if(event.target===this){kiloDlg=false;render();}">
         <div class="modal-sheet">
@@ -1510,11 +1508,24 @@ function buildKalori(){
       </div>`;
     }
     html+=`<div style="height:20px"></div>`;
+    if(hedefDlg)html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Kalori Hedefi</div>
+        <div style="margin:16px 0 20px">
+          <input id="hedef-inp" class="field-input" type="number" placeholder="kcal" value="${state.kalori.hedef||2000}" style="font-size:24px;font-weight:800;text-align:center"/>
+        </div>
+        <div class="modal-btns">
+          <button class="save-btn" onclick="hedefKaydet()" style="margin-top:0">Kaydet</button>
+          <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
+        </div>
+      </div>
+    </div>`;
     return html;
   }
 
   html+=`<div class="kalori-hero">
-    <div class="kalori-ring-wrap">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
       <div class="kalori-ring">
         <svg viewBox="0 0 90 90"><circle class="kalori-ring-bg" cx="45" cy="45" r="${r}"/><circle class="kalori-ring-fill" cx="45" cy="45" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${dash}"/></svg>
         <div class="kalori-ring-text">
@@ -1522,21 +1533,34 @@ function buildKalori(){
           <div class="kalori-ring-lbl">kcal</div>
         </div>
       </div>
-      <div class="kalori-macros">
-        <div style="font-size:12px;font-weight:600;color:var(--sub);margin-bottom:2px;display:flex;align-items:center;gap:5px;cursor:pointer" onclick="setKaloriHedef()">
+      <div style="display:flex;gap:10px;flex:1;justify-content:space-around">
+        ${[['P','#70A888',topProtein,hedef*0.3/4],['K','#C89020',topKarb,hedef*0.4/4],['Y','#C07060',topYag,hedef*0.3/9]].map(([lbl,clr,val,maks])=>{
+          const mR=22,mC=2*Math.PI*mR,mRate=maks>0?Math.min(1,val/maks):0,mDash=mC*mRate;
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <div style="position:relative;width:52px;height:52px">
+              <svg viewBox="0 0 52 52" width="52" height="52">
+                <circle cx="26" cy="26" r="${mR}" fill="none" stroke="var(--border)" stroke-width="5"/>
+                <circle cx="26" cy="26" r="${mR}" fill="none" stroke="${clr}" stroke-width="5"
+                  stroke-dasharray="${mDash} ${mC-mDash}" stroke-dashoffset="${mC/4}" stroke-linecap="round"/>
+                <text x="26" y="30" text-anchor="middle" font-family="Nunito,sans-serif" font-size="10" font-weight="800" fill="${clr}">${val}g</text>
+              </svg>
+            </div>
+            <div style="font-size:10px;font-weight:700;color:var(--sub)">${lbl==='P'?'Protein':lbl==='K'?'Karb':'Yağ'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="border:1px solid var(--border);border-radius:10px;padding:8px 12px">
+        <div style="font-size:13px;font-weight:600;color:var(--sub);margin-bottom:4px;display:flex;align-items:center;gap:6px">
           <span style="font-size:13px">🎯</span>
-          <span>Hedef: <b style="color:var(--text)">${hedef} kcal</b></span>
+          <span style="flex:1">Hedef: <b style="color:var(--text)">${hedef} kcal</b></span>
+          <button style="padding:2px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:var(--sub);cursor:pointer" onclick="bsv='kalori';hedefDlg=true;render()">Düzenle</button>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:6px">
+          <span style="font-size:13px">🔥</span><span style="flex:1">Kalan: <b style="color:${topKal>hedef?'#B03020':'var(--text)'}">${Math.max(0,hedef-topKal)} kcal</b></span>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--sub);margin-bottom:4px;display:flex;align-items:center;gap:5px">
-          <span style="font-size:13px">🔋</span>
-          <span>Kalan: <b style="color:${topKal>hedef?'#B03020':'var(--text)'}">${Math.max(0,hedef-topKal)}</b></span>
-        </div>
-        ${[['protein','#70A888',topProtein],['karb','#C89020',topKarb],['yağ','#C07060',topYag]].map(([n,c,v])=>`
-        <div class="macro-row">
-          <div class="macro-dot" style="background:${c}"></div>
-          <div class="macro-name">${n}</div>
-          <div class="macro-val">${v}g</div>
-        </div>`).join('')}
+
       </div>
     </div>
   </div>`;
@@ -1614,6 +1638,21 @@ function buildKalori(){
     </div>`;
   }
 
+  if(hedefDlg){
+    html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Kalori Hedefi</div>
+        <div style="margin:16px 0 20px">
+          <input id="hedef-inp" class="field-input" type="number" placeholder="kcal" value="${state.kalori.hedef||2000}" style="font-size:24px;font-weight:800;text-align:center"/>
+        </div>
+        <div class="modal-btns">
+          <button class="save-btn" onclick="hedefKaydet()" style="margin-top:0">Kaydet</button>
+          <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
+        </div>
+      </div>
+    </div>`;
+  }
   html += `<div style="height:20px"></div>`;
   return html;
 }
