@@ -699,6 +699,11 @@ let ozetAcikAy=null; // aylık özet seçili ay (1-12)
 let harcamaFiltre='tumu'; // tumu | bekleyen | odendi
 let harcamaYil=new Date().getFullYear();
 let favAcik=false;
+let favDlg=false;
+let favArama="";
+let besinArama="";
+let besinSonuclar=[];
+let besinArıyor=false;
 let hedefDlg=false;
 let harcamaAy=0; // 0 = tüm yıl, 1-12 = ay
 let takipAbonelikPeriyot='aylik'; // aylik | yillik
@@ -1591,35 +1596,46 @@ function buildKalori(){
 
   if(kform){
     const ogünLabel={'sabah':'Sabah','ogle':'Öğle','aksam':'Akşam','atistirma':'Atıştırmalık'}[kform.ogün];
-    html+=`<div class="besin-form" id="besin-form-el">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:800;color:var(--text)">${ogünLabel} · Besin Ekle</div>
-        <button onclick="besinKapat()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
-      </div>
-      <div style="margin-bottom:12px">
-        <button onclick="favAcik=!favAcik;render()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:6px">
+    html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){besinKapat();}">
+      <div style="background:var(--card);border-radius:20px;padding:20px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:15px;font-weight:800;color:var(--text)">${ogünLabel} · Besin Ekle</div>
+          <button onclick="besinKapat()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
+        </div>
+        <button onclick="favDlg=true;favArama='';render()" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;margin-bottom:10px">
           <span>⭐ Favorilerden Seç</span>
-          <span>${favAcik?'▲':'▼'}</span>
+          <span>›</span>
         </button>
-        ${favAcik?`<div style="display:flex;flex-wrap:wrap;gap:4px">
-          ${(state.kalori.favoriler||[]).map(f=>`<div class="fav-chip" onclick="favEkle('${kform.ogün}','${f.id}')">${f.emoji} ${esc(f.name)} <span style="color:var(--sub);font-weight:600">${f.kal}kcal</span></div>`).join('')}
+        <div class="field-label" style="margin-bottom:6px">🔍 Besin Ara</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input id="besin-ara-inp" class="field-input" placeholder="örn. yumurta, tavuk..." value="${besinArama}" oninput="besinArama=this.value" onkeydown="if(event.key==='Enter'){besinAra()}" style="flex:1"/>
+          <button onclick="besinAra()" style="padding:10px 14px;border-radius:12px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${besinArıyor?'...':'Ara'}</button>
+        </div>
+        ${besinSonuclar.length?`<div style="max-height:160px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px">
+          ${besinSonuclar.map((s,i)=>`<div onclick="besinSec(${i})" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(s.name)}</div>
+              <div style="font-size:10px;color:var(--sub)">${s.kal}kcal · P:${s.protein}g K:${s.karb}g Y:${s.yag}g</div>
+            </div>
+            <span style="font-size:11px;color:var(--sub);flex-shrink:0;margin-left:8px">+</span>
+          </div>`).join('')}
         </div>`:''}
-      </div>
-      <div class="field-label" style="margin-bottom:8px">Manuel Gir</div>
-      <div style="margin-bottom:8px">
-        <input id="b-name" class="field-input" placeholder="İsim"/>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px">
-        <div><div class="field-label">Kalori</div><input id="b-kal" class="field-input" type="number" placeholder="0"/></div>
-        <div><div class="field-label">Protein</div><input id="b-pro" class="field-input" type="number" placeholder="0g"/></div>
-        <div><div class="field-label">Karb</div><input id="b-karb" class="field-input" type="number" placeholder="0g"/></div>
-        <div><div class="field-label">Yağ</div><input id="b-yag" class="field-input" type="number" placeholder="0g"/></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button onclick="besinKaydet('${kform.ogün}')" class="save-btn" style="margin-top:0">Ekle</button>
+        <div class="field-label" style="margin-bottom:8px">✏️ Manuel Gir</div>
+        <div style="margin-bottom:8px">
+          <input id="b-name" class="field-input" placeholder="İsim"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+          <div><div class="field-label" style="text-align:center">Kalori</div><input id="b-kal" class="field-input" type="number" placeholder="0"/></div>
+          <div><div class="field-label" style="text-align:center">Protein</div><input id="b-pro" class="field-input" type="number" placeholder="0g"/></div>
+          <div><div class="field-label" style="text-align:center">Karb</div><input id="b-karb" class="field-input" type="number" placeholder="0g"/></div>
+          <div><div class="field-label" style="text-align:center">Yağ</div><input id="b-yag" class="field-input" type="number" placeholder="0" style="text-align:center"/></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="besinKaydet('${kform.ogün}')" class="save-btn" style="margin-top:0;flex:1">Ekle</button>
+          <button onclick="favoriEkle()" style="padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer">⭐ Favoriye Ekle</button>
+        </div>
       </div>
     </div>`;
-    setTimeout(()=>{const el=document.getElementById('besin-form-el');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
   }
 
   if(kiloDlg){
@@ -1638,6 +1654,31 @@ function buildKalori(){
     </div>`;
   }
 
+  if(favDlg){
+    const favFiltre=(state.kalori.favoriler||[]).filter(f=>f.name.toLowerCase().includes(favArama.toLowerCase()));
+    html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){favDlg=false;render();}">
+      <div class="modal-sheet" style="max-height:80vh;display:flex;flex-direction:column;max-width:400px;border-radius:20px">
+        <div class="modal-handle"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 12px">
+          <div class="modal-title" style="margin:0">Favoriler</div>
+          <button onclick="favDlg=false;render()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
+        </div>
+        <input oninput="favArama=this.value;render()" value="${favArama}" placeholder="Ara..." class="field-input" style="margin-bottom:10px"/>
+        <div style="overflow-y:auto;flex:1">
+          ${favFiltre.length?favFiltre.map(f=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="font-size:20px">${f.emoji}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:800;color:var(--text)">${esc(f.name)}</div>
+              <div style="font-size:11px;color:var(--sub)">${f.kal}kcal · P:${f.protein}g K:${f.karb}g Y:${f.yag}g</div>
+            </div>
+            <button onclick="favEkle('${kform?.ogün||'sabah'}','${f.id}');favDlg=false;render()" style="padding:5px 10px;border-radius:8px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer">Ekle</button>
+            <button onclick="favSil('${f.id}')" style="padding:5px 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer">🗑️</button>
+          </div>`).join(''):'<div style="text-align:center;color:var(--sub);padding:20px">Sonuç bulunamadı</div>'}
+        </div>
+      </div>
+    </div>`;
+  }
   if(hedefDlg){
     html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
       <div class="modal-sheet">
@@ -1659,6 +1700,53 @@ function buildKalori(){
 
 function besinEkleAc(ogün){kform={ogün};render();setTimeout(()=>{const el=document.getElementById('besin-form-el');if(el)el.scrollIntoView({behavior:'smooth'});},80);}
 function besinKapat(){kform=null;render();}
+async function besinAra(){
+  const q=document.getElementById('besin-ara-inp')?.value?.trim();
+  if(!q)return;
+  besinArama=q;besinArıyor=true;besinSonuclar=[];render();
+  try{
+    const r=await fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=10&fields=product_name,nutriments');
+    const d=await r.json();
+    besinSonuclar=(d.products||[]).filter(p=>p.product_name&&p.nutriments).map(p=>({
+      name:p.product_name,
+      kal:Math.round(p.nutriments['energy-kcal_100g']||p.nutriments['energy-kcal']||0),
+      protein:Math.round(p.nutriments['proteins_100g']||0),
+      karb:Math.round(p.nutriments['carbohydrates_100g']||0),
+      yag:Math.round(p.nutriments['fat_100g']||0)
+    })).filter(p=>p.kal>0).slice(0,8);
+  }catch(e){showToast('Arama başarısız');}
+  besinArıyor=false;render();
+}
+function besinSec(i){
+  const s=besinSonuclar[i];if(!s)return;
+  const n=document.getElementById('b-name');
+  const k=document.getElementById('b-kal');
+  const p=document.getElementById('b-pro');
+  const c=document.getElementById('b-karb');
+  const y=document.getElementById('b-yag');
+  if(n)n.value=s.name;
+  if(k)k.value=s.kal;
+  if(p)p.value=s.protein;
+  if(c)c.value=s.karb;
+  if(y)y.value=s.yag;
+  besinSonuclar=[];render();
+}
+function favSil(fid){
+  state.kalori.favoriler=(state.kalori.favoriler||[]).filter(f=>f.id!==fid);
+  saveKalori();render();
+}
+function favoriEkle(){
+  const name=document.getElementById('b-name')?.value?.trim();
+  const kal=parseInt(document.getElementById('b-kal')?.value)||0;
+  const pro=parseInt(document.getElementById('b-pro')?.value)||0;
+  const karb=parseInt(document.getElementById('b-karb')?.value)||0;
+  const yag=parseInt(document.getElementById('b-yag')?.value)||0;
+  if(!name){showToast('İsim girin');return;}
+  const id='fav_'+Date.now();
+  if(!state.kalori.favoriler)state.kalori.favoriler=[];
+  state.kalori.favoriler.push({id,emoji:'🍽️',name,kal,protein:pro,karb,yag});
+  saveKalori();showToast(name+' favorilere eklendi ✓');
+}
 function favEkle(ogün,fid){
   const f=(state.kalori.favoriler||[]).find(x=>x.id===fid);if(!f)return;
   const td=todayStr();
