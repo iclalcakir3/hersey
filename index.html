@@ -780,6 +780,10 @@ let takipAbonelikPeriyot='aylik'; // aylik | yillik
 let takipForm=null;
 
 function render(){
+  // Yeni egzersizleri state'e merge et
+  if(!state.antrenman)state.antrenman={program:[],gunluk:{},egzersizler:[]};
+  if(!state.antrenman.egzersizler)state.antrenman.egzersizler=[];
+  TUME_EGZERSIZLER.forEach(e=>{if(!state.antrenman.egzersizler.find(x=>x.id===e.id))state.antrenman.egzersizler.push(e);});
   document.getElementById("app").innerHTML=buildApp();
   updateNav();
   savePos();
