@@ -401,12 +401,12 @@ body{font-family:'Nunito',sans-serif;color:#3D1F0A;padding-bottom:150px;overflow
   background:var(--card);border-radius:20px;padding:18px;
   margin-bottom:12px;border:1.5px solid var(--border);
 }
-.su-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.su-title{font-size:15px;font-weight:800;color:var(--text);}
+.su-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.su-title{font-size:14px;font-weight:800;color:var(--text);}
 .su-sub{font-size:12px;font-weight:600;color:var(--sub);}
-.su-cups{display:flex;gap:6px;flex-wrap:wrap;}
+.su-cups{display:flex;gap:4px;}
 .su-cup{
-  width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border);
+  flex:1;height:40px;border-radius:10px;border:1.5px solid var(--border);
   background:var(--bg);font-size:18px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all .15s;
@@ -586,6 +586,47 @@ let state=(()=>{try{return JSON.parse(localStorage.getItem(SK)||"null");}catch{r
   {id:"e8",name:"Yüzme",kas:"Kardiyo",tip:"sure"},
   {id:"e9",name:"Plank",kas:"Core",tip:"sure"},
   {id:"e10",name:"Triceps Dips",kas:"Kol",tip:"agirlik"},
+  {id:"e11",name:"Incline Bench Press",kas:"Göğüs",tip:"agirlik"},
+  {id:"e12",name:"Dumbbell Fly",kas:"Göğüs",tip:"agirlik"},
+  {id:"e13",name:"Push-up",kas:"Göğüs",tip:"agirlik"},
+  {id:"e14",name:"Leg Press",kas:"Bacak",tip:"agirlik"},
+  {id:"e15",name:"Lunges",kas:"Bacak",tip:"agirlik"},
+  {id:"e16",name:"Leg Curl",kas:"Bacak",tip:"agirlik"},
+  {id:"e17",name:"Leg Extension",kas:"Bacak",tip:"agirlik"},
+  {id:"e18",name:"Calf Raise",kas:"Bacak",tip:"agirlik"},
+  {id:"e19",name:"Barbell Row",kas:"Sırt",tip:"agirlik"},
+  {id:"e20",name:"Lat Pulldown",kas:"Sırt",tip:"agirlik"},
+  {id:"e21",name:"Seated Row",kas:"Sırt",tip:"agirlik"},
+  {id:"e22",name:"Face Pull",kas:"Omuz",tip:"agirlik"},
+  {id:"e23",name:"Lateral Raise",kas:"Omuz",tip:"agirlik"},
+  {id:"e24",name:"Front Raise",kas:"Omuz",tip:"agirlik"},
+  {id:"e25",name:"Bicep Curl",kas:"Kol",tip:"agirlik"},
+  {id:"e26",name:"Hammer Curl",kas:"Kol",tip:"agirlik"},
+  {id:"e27",name:"Skull Crusher",kas:"Kol",tip:"agirlik"},
+  {id:"e28",name:"Triceps Pushdown",kas:"Kol",tip:"agirlik"},
+  {id:"e29",name:"Ab Crunch",kas:"Core",tip:"agirlik"},
+  {id:"e30",name:"Leg Raise",kas:"Core",tip:"agirlik"},
+  {id:"e31",name:"Russian Twist",kas:"Core",tip:"agirlik"},
+  {id:"e32",name:"Cable Crunch",kas:"Core",tip:"agirlik"},
+  {id:"e33",name:"Yürüyüş",kas:"Kardiyo",tip:"sure"},
+  {id:"e34",name:"Kürek",kas:"Kardiyo",tip:"sure"},
+  {id:"e35",name:"İp Atlama",kas:"Kardiyo",tip:"sure"},
+  {id:"e36",name:"Eliptik",kas:"Kardiyo",tip:"sure"},
+  {id:"e37",name:"Hip Thrust",kas:"Bacak",tip:"agirlik"},
+  {id:"e38",name:"Romanian Deadlift",kas:"Bacak",tip:"agirlik"},
+  {id:"e39",name:"Dumbbell Row",kas:"Sırt",tip:"agirlik"},
+  {id:"e40",name:"Arnold Press",kas:"Omuz",tip:"agirlik"},
+  {id:"e41",name:"Dumbbell Split Squat",kas:"Bacak",tip:"agirlik"},
+  {id:"e42",name:"Single Leg Box Squat",kas:"Bacak",tip:"agirlik"},
+  {id:"e43",name:"Single Leg Feet Elevated Ham Bridge",kas:"Bacak",tip:"agirlik"},
+  {id:"e44",name:"Dumbbell Lying Leg Curl",kas:"Bacak",tip:"agirlik"},
+  {id:"e45",name:"High Knees",kas:"Kardiyo",tip:"sure"},
+  {id:"e46",name:"Alternating V-Ups",kas:"Core",tip:"agirlik"},
+  {id:"e47",name:"Dumbbell Biceps Curl",kas:"Kol",tip:"agirlik"},
+  {id:"e48",name:"Banded Lat Pulldown",kas:"Sırt",tip:"agirlik"},
+  {id:"e49",name:"Dumbbell Skull Crusher",kas:"Kol",tip:"agirlik"},
+  {id:"e50",name:"Dumbbell Overhead Press",kas:"Omuz",tip:"agirlik"},
+  {id:"e51",name:"Dumbbell Front Raise",kas:"Omuz",tip:"agirlik"},
 ]},
   kalori:{hedef:2000,gunler:{},su:{},kilo:[],favoriler:[
     {id:"f1",emoji:"🍳",name:"Yumurta",kal:155,protein:13,karb:1,yag:11},
@@ -644,9 +685,34 @@ window.addEventListener('offline', function(){
   showToast('Çevrimdışı — veriler yerel olarak kaydediliyor');
 });
 
+const TUME_EGZERSIZLER=[
+  {id:"e1",name:"Bench Press",kas:"Göğüs",tip:"agirlik"},{id:"e2",name:"Squat",kas:"Bacak",tip:"agirlik"},
+  {id:"e3",name:"Deadlift",kas:"Sırt",tip:"agirlik"},{id:"e4",name:"Pull-up",kas:"Sırt",tip:"agirlik"},
+  {id:"e5",name:"Shoulder Press",kas:"Omuz",tip:"agirlik"},{id:"e6",name:"Koşu",kas:"Kardiyo",tip:"sure"},
+  {id:"e7",name:"Bisiklet",kas:"Kardiyo",tip:"sure"},{id:"e8",name:"Yüzme",kas:"Kardiyo",tip:"sure"},
+  {id:"e9",name:"Plank",kas:"Core",tip:"sure"},{id:"e10",name:"Triceps Dips",kas:"Kol",tip:"agirlik"},
+  {id:"e11",name:"Incline Bench Press",kas:"Göğüs",tip:"agirlik"},{id:"e12",name:"Dumbbell Fly",kas:"Göğüs",tip:"agirlik"},
+  {id:"e13",name:"Push-up",kas:"Göğüs",tip:"agirlik"},{id:"e14",name:"Leg Press",kas:"Bacak",tip:"agirlik"},
+  {id:"e15",name:"Lunges",kas:"Bacak",tip:"agirlik"},{id:"e16",name:"Leg Curl",kas:"Bacak",tip:"agirlik"},
+  {id:"e17",name:"Leg Extension",kas:"Bacak",tip:"agirlik"},{id:"e18",name:"Calf Raise",kas:"Bacak",tip:"agirlik"},
+  {id:"e19",name:"Barbell Row",kas:"Sırt",tip:"agirlik"},{id:"e20",name:"Lat Pulldown",kas:"Sırt",tip:"agirlik"},
+  {id:"e21",name:"Seated Row",kas:"Sırt",tip:"agirlik"},{id:"e22",name:"Face Pull",kas:"Omuz",tip:"agirlik"},
+  {id:"e23",name:"Lateral Raise",kas:"Omuz",tip:"agirlik"},{id:"e24",name:"Front Raise",kas:"Omuz",tip:"agirlik"},
+  {id:"e25",name:"Bicep Curl",kas:"Kol",tip:"agirlik"},{id:"e26",name:"Hammer Curl",kas:"Kol",tip:"agirlik"},
+  {id:"e27",name:"Skull Crusher",kas:"Kol",tip:"agirlik"},{id:"e28",name:"Triceps Pushdown",kas:"Kol",tip:"agirlik"},
+  {id:"e29",name:"Ab Crunch",kas:"Core",tip:"agirlik"},{id:"e30",name:"Leg Raise",kas:"Core",tip:"agirlik"},
+  {id:"e31",name:"Russian Twist",kas:"Core",tip:"agirlik"},{id:"e32",name:"Cable Crunch",kas:"Core",tip:"agirlik"},
+  {id:"e33",name:"Yürüyüş",kas:"Kardiyo",tip:"sure"},{id:"e34",name:"Kürek",kas:"Kardiyo",tip:"sure"},
+  {id:"e35",name:"İp Atlama",kas:"Kardiyo",tip:"sure"},{id:"e36",name:"Eliptik",kas:"Kardiyo",tip:"sure"},
+  {id:"e37",name:"Hip Thrust",kas:"Bacak",tip:"agirlik"},{id:"e38",name:"Romanian Deadlift",kas:"Bacak",tip:"agirlik"},
+  {id:"e39",name:"Dumbbell Row",kas:"Sırt",tip:"agirlik"},{id:"e40",name:"Arnold Press",kas:"Omuz",tip:"agirlik"},
+];
 function save(){
   if(!state.todos)state.todos=[];
   if(!state.surezler)state.surezler=[];
+  if(!state.antrenman)state.antrenman={program:[],gunluk:{},egzersizler:[]};
+  if(!state.antrenman.egzersizler)state.antrenman.egzersizler=[];
+  TUME_EGZERSIZLER.forEach(e=>{if(!state.antrenman.egzersizler.find(x=>x.id===e.id))state.antrenman.egzersizler.push(e);});
   if(!state.surezGrupAcik)state.surezGrupAcik={};
   if(!state.istekler)state.istekler=[];
   if(!state.kullaniciAdi)state.kullaniciAdi='';
@@ -704,6 +770,10 @@ let favArama="";
 let besinArama="";
 let besinSonuclar=[];
 let besinArıyor=false;
+let suAralik="ay";
+let suHedefDlg=false; // hafta | ay | yil
+let suYil=new Date().getFullYear();
+let suAy=new Date().getMonth();
 let hedefDlg=false;
 let harcamaAy=0; // 0 = tüm yıl, 1-12 = ay
 let takipAbonelikPeriyot='aylik'; // aylik | yillik
@@ -1320,22 +1390,144 @@ function buildKalori(){
   let html=``;
   if(bsv==='su'){
     const suCount=((state.kalori.su||{})[todayStr()]||0);
-    const suHedef=8;
-    html+=`<div class="su-card">
+    const suHedef=state.kalori.suHedef||8;
+    html+=`<div class="su-card" style="height:150px">
       <div class="su-header">
         <div>
           <div class="su-title">💧 Su Takibi</div>
-          <div class="su-sub">${suCount} / ${suHedef} bardak</div>
+
         </div>
-        <div style="font-size:22px;font-weight:800;color:#3878A0">${suCount>=suHedef?'✓':suCount+'/'+suHedef}</div>
+        <div style="font-size:14px;font-weight:800;color:#3878A0">${suCount>=suHedef?'✓':suCount+'/'+suHedef}</div>
       </div>
       <div class="su-cups">
         ${Array.from({length:suHedef},(_,i)=>`<div class="su-cup ${i<suCount?'filled':''}" onclick="suToggle(${i},'${todayStr()}')">💧</div>`).join('')}
       </div>
-      <div style="margin-top:16px;font-size:13px;font-weight:600;color:var(--sub)">Günlük hedef: <b style="color:var(--text)">${suHedef} bardak (${suHedef*250}ml)</b></div>
+      <div style="margin-top:16px;font-size:14px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:8px">Günlük hedef: <b style="color:var(--text)">${suHedef} bardak (${suHedef*200}ml)</b><button onclick="suHedefDlg=true;render()" style="padding:2px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:var(--sub);cursor:pointer">Düzenle</button></div>
     </div>`;
-    html+=`<div style="height:20px"></div>`;
-    if(hedefDlg)html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
+
+    // İstatistik kutusu
+    const suVerisi=state.kalori.su||{};
+    const tumSuGunler=Object.keys(suVerisi).sort();
+    const toplamGun=tumSuGunler.length;
+    const toplamMl=Object.values(suVerisi).reduce((a,b)=>a+b,0)*250;
+    const ortMl=toplamGun>0?Math.round(toplamMl/toplamGun):0;
+    const hedefGunler=Object.values(suVerisi).filter(v=>v>=suHedef).length;
+    const bugun2=new Date();
+    const nowYil2=bugun2.getFullYear(),nowAy2=bugun2.getMonth();
+    const AYLAR_UZUN2=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+    const AYLAR_K2=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    const mevcutYillar2=[...new Set(tumSuGunler.map(d=>parseInt(d.slice(0,4))))];
+    if(!mevcutYillar2.includes(nowYil2))mevcutYillar2.push(nowYil2);
+    mevcutYillar2.sort();
+
+    let suFiltreLog=[];
+    if(suAralik==='ay'){
+      suFiltreLog=tumSuGunler.filter(d=>{const dd=new Date(d+'T12:00:00');return dd.getFullYear()===suYil&&dd.getMonth()===suAy;}).map(d=>({ds:d,bardak:suVerisi[d]}));
+    } else if(suAralik==='yil'){
+      suFiltreLog=tumSuGunler.filter(d=>parseInt(d.slice(0,4))===suYil).map(d=>({ds:d,bardak:suVerisi[d]}));
+    } else {
+      suFiltreLog=tumSuGunler.map(d=>({ds:d,bardak:suVerisi[d]}));
+    }
+
+    function buildSuChart(data){
+      const W=320,H=150,PL=38,PR=12,PT=16,PB=30,iW=W-PL-PR,iH=H-PT-PB;
+      const vals=data.map(d=>d.bardak*200);
+      const minV=0,maxV=Math.max(...vals,suHedef*200,1);
+      const pad=maxV*0.1;
+      const yMin=0,yMax=maxV+pad;
+      const py=v=>PT+iH-((v-yMin)/(yMax-yMin))*iH;
+      let gridLines='',yLabels='';
+      for(let i=0;i<=3;i++){
+        const v=yMin+(yMax-yMin)*(i/3),y=py(v);
+        gridLines+=`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="#E8DDD4" stroke-width="1"/>`;
+        yLabels+=`<text x="${PL-5}" y="${(y+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="#7A6858" font-family="Nunito,sans-serif" font-weight="600">${Math.round(v)}ml</text>`;
+      }
+      let xLabels='';
+      if(suAralik==='ay'){
+        const ag=new Date(suYil,suAy+1,0).getDate();
+        [1,8,15,22,ag].forEach(g=>{const x=PL+((g-1)/(ag-1))*iW;xLabels+=`<text x="${x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="8" fill="#7A6858" font-family="Nunito,sans-serif" font-weight="600">${g}</text>`;});
+      } else if(suAralik==='yil'){
+        for(let m=0;m<12;m++){const x=PL+(m/11)*iW;xLabels+=`<text x="${x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="8" fill="#7A6858" font-family="Nunito,sans-serif" font-weight="600">${AYLAR_K2[m]}</text>`;}
+      } else {
+        const n2=data.length;if(n2>1){const step=Math.max(1,Math.floor(n2/5));data.forEach((k,i)=>{if(i===0||i===n2-1||i%step===0){const d=new Date(k.ds+'T12:00:00'),x=PL+(i/(n2-1))*iW;xLabels+=`<text x="${x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-size="8" fill="#7A6858" font-family="Nunito,sans-serif" font-weight="600">${(d.getMonth()+1)+'/'+(d.getFullYear()+'').slice(2)}</text>`;}});}
+      }
+      let pxFn;
+      if(suAralik==='ay'){const ag=new Date(suYil,suAy+1,0).getDate();pxFn=(k)=>{const d=new Date(k.ds+'T12:00:00');return PL+((d.getDate()-1)/(ag-1))*iW;};}
+      else if(suAralik==='yil'){pxFn=(k)=>{const d=new Date(k.ds+'T12:00:00');return PL+(d.getMonth()/11)*iW;};}
+      else{pxFn=(k,i,arr)=>PL+(arr.length>1?i/(arr.length-1):0.5)*iW;}
+      // Hedef çizgisi
+      const hedefY=py(suHedef*200);
+      const hedefLine=`<line x1="${PL}" y1="${hedefY.toFixed(1)}" x2="${W-PR}" y2="${hedefY.toFixed(1)}" stroke="#78B0C8" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>`;
+      let area='',line='',dots='';
+      if(data.length>=2){
+        const pts=data.map((k,i,a)=>`${pxFn(k,i,a).toFixed(1)},${py(k.bardak*200).toFixed(1)}`).join(' ');
+        const ap=`M${pxFn(data[0],0,data).toFixed(1)},${py(data[0].bardak*200).toFixed(1)} `+data.map((k,i,a)=>`L${pxFn(k,i,a).toFixed(1)},${py(k.bardak*200).toFixed(1)}`).join(' ')+` L${pxFn(data[data.length-1],data.length-1,data).toFixed(1)},${(PT+iH).toFixed(1)} L${pxFn(data[0],0,data).toFixed(1)},${(PT+iH).toFixed(1)} Z`;
+        area=`<path d="${ap}" fill="url(#su-grad)"/>`;
+        line=`<polyline points="${pts}" fill="none" stroke="#3878A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+        dots=data.map((k,i,a)=>`<circle cx="${pxFn(k,i,a).toFixed(1)}" cy="${py(k.bardak*200).toFixed(1)}" r="${data.length>30?2:3}" fill="${k.bardak>=suHedef?'#3878A0':'#A8D0E8'}" stroke="white" stroke-width="1.5"/>`).join('');
+      } else if(data.length===1){
+        dots=`<circle cx="${pxFn(data[0],0,[data[0]]).toFixed(1)}" cy="${py(data[0].bardak*200).toFixed(1)}" r="4" fill="#3878A0" stroke="white" stroke-width="1.5"/>`;
+      }
+      return `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;overflow:visible;"><defs><linearGradient id="su-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3878A0" stop-opacity="0.2"/><stop offset="100%" stop-color="#3878A0" stop-opacity="0.01"/></linearGradient></defs>${gridLines}${yLabels}${xLabels}${hedefLine}${area}${line}${dots}</svg>`;
+    }
+
+    const suHasData=suFiltreLog.length>0;
+    const suMinV=suHasData?Math.min(...suFiltreLog.map(d=>d.bardak*200)):null;
+    const suMaxV=suHasData?Math.max(...suFiltreLog.map(d=>d.bardak*200)):null;
+    const suAvgV=suHasData?Math.round(suFiltreLog.reduce((s,d)=>s+d.bardak*200,0)/suFiltreLog.length):null;
+
+    const ddStyle2=`width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;outline:none;-webkit-appearance:none;appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%237A6858%22 stroke-width=%221.5%22 fill=%22none%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;cursor:pointer`;
+
+    let suAyOptions='',suYilOptions='';
+    mevcutYillar2.slice().reverse().forEach(y=>{
+      for(let m=11;m>=0;m--){
+        if(y>nowYil2||(y===nowYil2&&m>nowAy2))continue;
+        const hasE=tumSuGunler.some(d=>{const dd=new Date(d+'T12:00:00');return dd.getFullYear()===y&&dd.getMonth()===m;});
+        if(hasE)suAyOptions+=`<option value="${y}-${m}" ${suYil===y&&suAy===m?'selected':''}>${AYLAR_UZUN2[m]} ${y}</option>`;
+      }
+      suYilOptions+=`<option value="${y}" ${suYil===y?'selected':''}>${y}</option>`;
+    });
+
+    html+=`<div class="kilo-card" style="padding:16px 14px 14px;min-height:320px">
+      <div style="display:flex;gap:4px;margin-bottom:12px">
+        ${[['ay','Aylık'],['yil','Yıllık'],['tumu','Tümü']].map(([v,lb])=>`<button onclick="suAralik='${v}';render()" style="flex:1;padding:7px 4px;border-radius:10px;border:1.5px solid ${suAralik===v?'var(--text)':'var(--border)'};background:${suAralik===v?'var(--text)':'var(--bg)'};color:${suAralik===v?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">${lb}</button>`).join('')}
+      </div>
+      ${suAralik==='ay'?`<select onchange="const p=this.value.split('-');suYil=parseInt(p[0]);suAy=parseInt(p[1]);render()" style="${ddStyle2}">${suAyOptions}</select>`
+      :suAralik==='yil'?`<select onchange="suYil=parseInt(this.value);render()" style="${ddStyle2}">${suYilOptions}</select>`
+      :`<div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:12px">Tüm geçmiş · ${tumSuGunler.length} giriş</div>`}
+      <div style="margin-bottom:8px">${buildSuChart(suFiltreLog)}</div>
+      <div style="display:flex;border:1.5px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="text-align:center;flex:1;padding:10px 6px">
+          <div style="font-size:16px;font-weight:800;color:${suHasData?'var(--text)':'var(--sub)'}">${suHasData?suMinV+'ml':'—'}</div>
+          <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px">En az</div>
+        </div>
+        <div style="text-align:center;flex:1;padding:10px 6px;border-left:1.5px solid var(--border);border-right:1.5px solid var(--border)">
+          <div style="font-size:16px;font-weight:800;color:${suHasData?'var(--text)':'var(--sub)'}">${suHasData?suAvgV+'ml':'—'}</div>
+          <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px">Ortalama</div>
+        </div>
+        <div style="text-align:center;flex:1;padding:10px 6px;border-right:1.5px solid var(--border)">
+          <div style="font-size:16px;font-weight:800;color:${suHasData?'var(--text)':'var(--sub)'}">${suHasData?suMaxV+'ml':'—'}</div>
+          <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px">En çok</div>
+        </div>
+        <div style="text-align:center;flex:1;padding:10px 6px">
+          <div style="font-size:16px;font-weight:800;color:var(--text)">${hedefGunler}</div>
+          <div style="font-size:9px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.5px">Hedef gün</div>
+        </div>
+      </div>
+    </div>`;
+    if(suHedefDlg){
+    html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){suHedefDlg=false;render();}">
+      <div style="background:var(--card);border-radius:20px;padding:20px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:16px">Su Hedefi</div>
+        <input id="su-hedef-inp" class="field-input" type="number" placeholder="bardak" value="${state.kalori.suHedef||8}" style="font-size:24px;font-weight:800;text-align:center;margin-bottom:16px"/>
+        <div style="display:flex;gap:8px">
+          <button onclick="const v=parseInt(document.getElementById('su-hedef-inp')?.value);if(v&&v>0&&v<=20){state.kalori.suHedef=v;saveKalori();suHedefDlg=false;render();showToast('Hedef güncellendi ✓');}" class="save-btn" style="margin-top:0;flex:1">Kaydet</button>
+          <button onclick="suHedefDlg=false;render()" style="padding:10px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer">Vazgeç</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  if(hedefDlg){html+=`<div class="modal-overlay" onclick="if(event.target===this){hedefDlg=false;render();}">
       <div class="modal-sheet">
         <div class="modal-handle"></div>
         <div class="modal-title">Kalori Hedefi</div>
@@ -1347,7 +1539,7 @@ function buildKalori(){
           <button class="modal-btn-cancel" onclick="hedefDlg=false;render()">Vazgeç</button>
         </div>
       </div>
-    </div>`;
+    </div>`;}
     return html;
   }
 
@@ -1358,7 +1550,7 @@ function buildKalori(){
     const fark=sonKilo&&ilkKilo?(sonKilo.kg-ilkKilo.kg).toFixed(1):null;
 
     // ── Özet kart ──
-    html+=`<div class="kilo-card">
+    html+=`<div class="kilo-card" style="height:150px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div class="su-title">⚖️ Kilo Takibi</div>
         <button onclick="openKiloGir()" style="padding:7px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer">+ Gir</button>
@@ -1463,7 +1655,7 @@ function buildKalori(){
         yilOptions+=`<option value="${y}" ${kiloYil===y?'selected':''}>${y}</option>`;
       });
 
-      html+=`<div class="kilo-card" style="padding:16px 14px 14px">
+      html+=`<div class="kilo-card" style="padding:16px 14px 14px;min-height:320px">
         <div style="display:flex;gap:4px;margin-bottom:12px">
           ${[['ay','Aylık'],['yil','Yıllık'],['tumu','Tümü']].map(([v,lb])=>`<button onclick="kiloAralik='${v}';render()" style="flex:1;padding:7px 4px;border-radius:10px;border:1.5px solid ${kiloAralik===v?'var(--text)':'var(--border)'};background:${kiloAralik===v?'var(--text)':'var(--bg)'};color:${kiloAralik===v?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">${lb}</button>`).join('')}
         </div>
@@ -1611,7 +1803,7 @@ function buildKalori(){
           <input id="besin-ara-inp" class="field-input" placeholder="örn. yumurta, tavuk..." value="${besinArama}" oninput="besinArama=this.value" onkeydown="if(event.key==='Enter'){besinAra()}" style="flex:1"/>
           <button onclick="besinAra()" style="padding:10px 14px;border-radius:12px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${besinArıyor?'...':'Ara'}</button>
         </div>
-        ${besinSonuclar.length?`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-size:11px;color:var(--sub);font-weight:600">${besinSonuclar.length} sonuç</div><button onclick="besinSonuclar=[];render()" style="border:none;background:none;font-size:12px;color:var(--sub);cursor:pointer">✕ Kapat</button></div><div style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:10px">
+        ${besinSonuclar.length?`<div style="max-height:160px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px">
           ${besinSonuclar.map((s,i)=>`<div onclick="besinSec(${i})" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div>
               <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(s.name)}</div>
@@ -1619,7 +1811,7 @@ function buildKalori(){
             </div>
             <span style="font-size:11px;color:var(--sub);flex-shrink:0;margin-left:8px">+</span>
           </div>`).join('')}
-        </div></div>`:''}
+        </div>`:''}
         <div class="field-label" style="margin-bottom:8px">✏️ Manuel Gir</div>
         <div style="margin-bottom:8px">
           <input id="b-name" class="field-input" placeholder="İsim"/>
@@ -1850,7 +2042,7 @@ function buildAntrenman(){
     html+=`<div style="margin-top:4px">
       <div class="field-label" style="margin-bottom:8px">Egzersiz Ekle</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${(state.antrenman.egzersizler||[]).map(e=>`<div class="fav-chip" onclick="egEkle('${td}','${e.id}')">${e.name} <span style="color:var(--sub);font-size:11px">${e.kas}</span></div>`).join("")}
+        ${TUME_EGZERSIZLER.map(e=>`<div class="fav-chip" onclick="egEkle('${td}','${e.id}')">${e.name} <span style="color:var(--sub);font-size:11px">${e.kas}</span></div>`).join("")}
       </div>
     </div>`;
   }
@@ -1875,15 +2067,48 @@ function buildAntrenman(){
     if(typeof programDlg!=="undefined"&&programDlg!==null){
       const gi=programDlg;
       const pg=state.antrenman.program[gi]||{egzersizler:[]};
-      html+=`<div class="modal-overlay" onclick="if(event.target===this){programDlg=null;render();}">
-        <div class="modal-sheet">
-          <div class="modal-handle"></div>
+      html+=`<div class="modal-overlay" style="align-items:center" onclick="if(event.target===this){programDlg=null;render();}">
+        <div style="background:var(--card);border-radius:20px;padding:20px;width:90%;max-width:400px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
           <div class="modal-title">${HAFTAGUNLERI[gi]} Egzersizleri</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin:12px 0">
-            ${(state.antrenman.egzersizler||[]).map(e=>{
-              const sel=(pg.egzersizler||[]).includes(e.id);
-              return `<div class="fav-chip" style="${sel?`background:${COLORS[2].bg};border-color:#8898C8`:""}" onclick="programToggle(${gi},'${e.id}')">${sel?"✓ ":""}${e.name}</div>`;
-            }).join("")}
+          <div style="margin:12px 0">
+            ${(()=>{
+              const ustVucut=['Göğüs','Sırt','Omuz','Kol','Core'];
+              const altVucut=['Bacak'];
+              const kardiyo=['Kardiyo'];
+              const bolumler=[['Üst Vücut',ustVucut],['Alt Vücut',altVucut],['Kardiyo',kardiyo]];
+              return bolumler.map(([bolumAd,kasGruplari])=>{
+                const bolumEgler=TUME_EGZERSIZLER.filter(e=>kasGruplari.includes(e.kas));
+                const kaslar=[...new Set(bolumEgler.map(e=>e.kas))];
+                return `<div style="margin-bottom:12px">
+                  <div style="font-size:11px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:4px;border-bottom:1.5px solid var(--border)">${bolumAd}</div>
+                  ${kaslar.map(k=>{
+                    const egler=bolumEgler.filter(e=>e.kas===k);
+                    const acik=!!programAcikKaslar[k];
+                    const secili=egler.filter(e=>(pg.egzersizler||[]).includes(e.id)).length;
+                    return `<div style="border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden">
+                      <div onclick="programAcikKaslar['${k}']=!programAcikKaslar['${k}'];render()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;background:var(--bg)">
+                        <span style="font-size:13px;font-weight:800;color:var(--text)">${k}</span>
+                        <div style="display:flex;align-items:center;gap:8px">
+                          ${secili>0?`<span style="font-size:11px;font-weight:700;color:#8898C8">${secili} seçili</span>`:''}
+                          <span style="font-size:12px;color:var(--sub)">${acik?'▲':'▼'}</span>
+                        </div>
+                      </div>
+                      ${acik?`<div style="border-top:1px solid var(--border)">
+                        ${egler.map(e=>{
+                          const sel=(pg.egzersizler||[]).includes(e.id);
+                          return `<div onclick="programToggle(${gi},'${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;background:${sel?`${COLORS[2].bg}`:'var(--card)'}">
+                            <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${sel?'#8898C8':'var(--border)'};background:${sel?'#8898C8':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                              ${sel?'<span style="color:white;font-size:11px;font-weight:800">✓</span>':''}
+                            </div>
+                            <span style="font-size:13px;font-weight:600;color:var(--text)">${e.name}</span>
+                          </div>`;
+                        }).join("")}
+                      </div>`:''}
+                    </div>`;
+                  }).join("")}
+                </div>`;
+              }).join("");
+            })()}
           </div>
           <button class="save-btn" onclick="programDlg=null;render()" style="margin-top:8px">Tamam</button>
         </div>
@@ -1950,6 +2175,7 @@ function buildAntrenman(){
 }
 
 let programDlg=null;
+let programAcikKaslar={};
 
 function egEkle(ds,eid2){
   const eg=(state.antrenman.egzersizler||[]).find(e=>e.id===eid2);if(!eg)return;
