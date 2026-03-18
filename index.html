@@ -1611,7 +1611,7 @@ function buildKalori(){
           <input id="besin-ara-inp" class="field-input" placeholder="örn. yumurta, tavuk..." value="${besinArama}" oninput="besinArama=this.value" onkeydown="if(event.key==='Enter'){besinAra()}" style="flex:1"/>
           <button onclick="besinAra()" style="padding:10px 14px;border-radius:12px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${besinArıyor?'...':'Ara'}</button>
         </div>
-        ${besinSonuclar.length?`<div style="max-height:160px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:10px" onclick="event.stopPropagation()">
+        ${besinSonuclar.length?`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-size:11px;color:var(--sub);font-weight:600">${besinSonuclar.length} sonuç</div><button onclick="besinSonuclar=[];render()" style="border:none;background:none;font-size:12px;color:var(--sub);cursor:pointer">✕ Kapat</button></div><div style="max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:10px">
           ${besinSonuclar.map((s,i)=>`<div onclick="besinSec(${i})" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div>
               <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(s.name)}</div>
@@ -1619,7 +1619,7 @@ function buildKalori(){
             </div>
             <span style="font-size:11px;color:var(--sub);flex-shrink:0;margin-left:8px">+</span>
           </div>`).join('')}
-        </div>`:''}
+        </div></div>`:''}
         <div class="field-label" style="margin-bottom:8px">✏️ Manuel Gir</div>
         <div style="margin-bottom:8px">
           <input id="b-name" class="field-input" placeholder="İsim"/>
