@@ -888,7 +888,7 @@ let odemeAcikId=null; // istatistik paneli açık olan ödeme id'si
 let ozetAcikYil=null; // yıllık özet açık yıl
 let ozetAcikAy=null; // aylık özet seçili ay (1-12)
 let harcamaFiltre='tumu'; // tumu | bekleyen | odendi
-let harcamaYil=new Date().getFullYear();
+let harcamaYil=-1;
 let favAcik=false;
 let favDlg=false;
 let favArama="";
@@ -2630,7 +2630,7 @@ function buildTodo(){
     if(goruntuleSureziz.length===0){
       html+=`<div class="empty"><div class="empty-emoji">🌟</div><div class="empty-title">Süresiz madde yok</div><div class="empty-sub">+ ile ekle</div></div>`;
     } else {
-      const SUREZ_ETIKET_CFG={standup:{em:'🎤',clr:'#7A6EC4',bg:'#EEEDF8'},konser:{em:'🎵',clr:'#C84848',bg:'#FAE8E8'},tiyatro:{em:'🎭',clr:'#C87828',bg:'#FAF0DC'},gezi:{em:'✈️',clr:'#2A9E78',bg:'#E0F4EE'},etkinlik:{em:'🎉',clr:'#B84A6A',bg:'#FAE8F0'},müze:{em:'🏛️',clr:'#6B4F3A',bg:'#F5EFE8'},piknik:{em:'🧺',clr:'#4A9060',bg:'#E8F5EC'},diger:{em:'📌',clr:'var(--sub)',bg:'var(--bg)'}};
+      const SUREZ_ETIKET_CFG={standup:{em:'🎤',clr:'#7A6EC4',bg:'#EEEDF8'},konser:{em:'🎵',clr:'#C84848',bg:'#FAE8E8'},tiyatro:{em:'🎭',clr:'#C87828',bg:'#FAF0DC'},gezi:{em:'✈️',clr:'#2A9E78',bg:'#E0F4EE'},etkinlik:{em:'🎉',clr:'#B84A6A',bg:'#FAE8F0'},müze:{em:'🏛️',clr:'#6B4F3A',bg:'#F5EFE8'},piknik:{em:'🧺',clr:'#4A9060',bg:'#E8F5EC'},diger:{em:'📌',clr:'#8A7060',bg:'#F0EDE8'}};
       const ETIKET_SIRA=['standup','konser','tiyatro','gezi','etkinlik','müze','piknik','diger'];
       const gruplar={};
       goruntuleSureziz.forEach(function(t){
@@ -2644,11 +2644,12 @@ function buildTodo(){
         const lbl=k==='diger'?'Diğer':k.charAt(0).toUpperCase()+k.slice(1);
         if(!gruplar[k])gruplar[k]=[];
         const grupAcik=state.surezGrupAcik[k]!==false;
-        html+='<button data-grp="'+k+'" onclick="surezGrupToggle(this.dataset.grp)" style="width:100%;display:flex;align-items:center;gap:8px;margin:16px 0 10px;background:transparent;border:none;cursor:pointer;padding:0;text-align:left">'
-          +'<span style="font-size:13px;font-weight:800;color:'+cfg.clr+'">'+cfg.em+' '+lbl+'</span>'
-          +'<span style="font-size:10px;font-weight:600;color:var(--sub)">('+(gruplar[k]?gruplar[k].length:0)+')</span>'
-          +'<div style="flex:1;height:1px;background:var(--border)"></div>'
-          +'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="'+cfg.clr+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;transform:rotate('+(grupAcik?0:180)+'deg);flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>'
+        html+='<button data-grp="'+k+'" onclick="surezGrupToggle(this.dataset.grp)" style="width:100%;display:flex;align-items:center;gap:10px;margin:10px 0 6px;background:'+cfg.bg+';border:1.5px solid '+cfg.clr+'30;border-radius:14px;cursor:pointer;padding:10px 14px;text-align:left;box-sizing:border-box">'
+          +'<span style="font-size:20px;line-height:1">'+cfg.em+'</span>'
+          +'<span style="font-size:14px;font-weight:800;color:'+cfg.clr+'">'+lbl+'</span>'
+          +'<span style="font-size:11px;font-weight:700;color:'+cfg.clr+';opacity:.7">'+( gruplar[k]?gruplar[k].length:0 )+'</span>'
+          +'<div style="flex:1"></div>'
+          +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="'+cfg.clr+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;transform:rotate('+(grupAcik?0:180)+'deg);flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>'
           +'</button>';
         if(grupAcik){
           gruplar[k].forEach(function(t){
@@ -2669,7 +2670,7 @@ function buildTodo(){
     // Form modal
     if(todoForm!==null&&todoForm._sureziz){
       const f=todoForm;
-      const ETIKETLER=[['standup','🎤','#7A6EC4','#EEEDF8'],['konser','🎵','#C84848','#FAE8E8'],['tiyatro','🎭','#C87828','#FAF0DC'],['gezi','✈️','#2A9E78','#E0F4EE'],['etkinlik','🎉','#B84A6A','#FAE8F0'],['müze','🏛️','#6B4F3A','#F5EFE8'],['piknik','🧺','#4A9060','#E8F5EC']];
+      const ETIKETLER=[['standup','🎤','#7A6EC4','#EEEDF8'],['konser','🎵','#C84848','#FAE8E8'],['tiyatro','🎭','#C87828','#FAF0DC'],['gezi','✈️','#2A9E78','#E0F4EE'],['etkinlik','🎉','#B84A6A','#FAE8F0'],['müze','🏛️','#6B4F3A','#F5EFE8'],['piknik','🧺','#4A9060','#E8F5EC'],['diger','📌','#7A6858','#F0EDE8']];
       html+=`<div class="modal-overlay" onclick="if(event.target===this){todoForm=null;render();}">
         <div class="modal-sheet">
           <div class="modal-handle"></div>
@@ -2678,8 +2679,8 @@ function buildTodo(){
             <div class="field-label" style="margin-bottom:6px">Başlık</div>
             <input id="todo-baslik" class="field-input" placeholder="örn. Tiyatroya git, Kitap oku..." value="${esc(f.baslik||'')}" style="font-size:15px;font-weight:700;margin-bottom:12px" oninput="todoForm.baslik=this.value"/>
             <div class="field-label" style="margin-bottom:8px">Etiket</div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-              ${ETIKETLER.map(([v,em,clr,bg])=>`<button type="button" onclick="todoForm.etiket=todoForm.etiket==='${v}'?null:'${v}';render()" style="padding:6px 12px;border-radius:20px;border:1.5px solid ${(f.etiket||'')===v?clr:'var(--border)'};background:${(f.etiket||'')===v?bg:'var(--bg)'};color:${(f.etiket||'')===v?clr:'var(--sub)'};font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer">${em} ${v.charAt(0).toUpperCase()+v.slice(1)}</button>`).join('')}
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px">
+              ${ETIKETLER.map(([v,em,clr,bg])=>`<button type="button" onclick="todoForm.etiket=todoForm.etiket==='${v}'?null:'${v}';render()" style="padding:6px 4px;border-radius:20px;border:1.5px solid ${(f.etiket||'')===v?clr:'var(--border)'};background:${(f.etiket||'')===v?bg:'var(--bg)'};color:${(f.etiket||'')===v?clr:'var(--sub)'};font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-align:center">${em} ${v==='diger'?'Diğer':v.charAt(0).toUpperCase()+v.slice(1)}</button>`).join('')}
             </div>
             <div class="field-label" style="margin-bottom:6px">Not <span style="font-weight:500;opacity:.6">(opsiyonel)</span></div>
             <input class="field-input" placeholder="Kısa bir not..." value="${esc(f.not||'')}" style="font-size:13px;margin-bottom:16px" oninput="todoForm.not=this.value"/>
@@ -2972,26 +2973,27 @@ function buildTakip(){
   // ── HARCAMALAR ──
   else if(takipSekme==='harcama'){
     const harcamalar=state.takip.harcamalar||[];
-    function harcamaTarih(h){
-      if(h.kalemler&&h.kalemler.length){const t=h.kalemler.map(k=>k.tarih||'').filter(Boolean).sort().reverse()[0];if(t)return t;}
-      return h.tarih||'';
-    }
-    // Yıl listesi - mevcut harcamalardan
-    const tumYillar=[...new Set(harcamalar.map(h=>{const t=harcamaTarih(h);return t?parseInt(t.slice(0,4)):null;}).filter(Boolean))].sort((a,b)=>b-a);
-    if(!tumYillar.includes(harcamaYil)&&tumYillar.length>0) harcamaYil=tumYillar[0];
     const AYLAR_TR=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
 
-    // Yıl/Ay filtresi uygula
-    const filtreliHarcamalar=harcamalar.filter(h=>{
-      const t=harcamaTarih(h);
-      if(!t) return harcamaAy===0;
-      const yil=parseInt(t.slice(0,4));
-      const ay=parseInt(t.slice(5,7));
-      if(yil!==harcamaYil) return false;
-      if(harcamaAy>0&&ay!==harcamaAy) return false;
-      return true;
+    // Yıl listesini KALEM tarihlerinden üret (harcama üst tarihi değil)
+    const tumYillarSet=new Set();
+    harcamalar.forEach(h=>{
+      (h.kalemler||[]).forEach(k=>{if(k.tarih)tumYillarSet.add(parseInt(k.tarih.slice(0,4)));});
+      // Kalemi olmayan harcamalarda h.tarih'e bak
+      if((!h.kalemler||!h.kalemler.length)&&h.tarih) tumYillarSet.add(parseInt(h.tarih.slice(0,4)));
     });
-    const sirali=filtreliHarcamalar.slice().sort((a,b)=>harcamaTarih(b).localeCompare(harcamaTarih(a)));
+    const tumYillar=[...tumYillarSet].filter(Boolean).sort((a,b)=>b-a);
+    // Tarihsiz kalem var mı?
+    const tarihsizVar=harcamalar.some(h=>(h.kalemler||[]).some(k=>!k.tarih));
+    // harcamaYil=0 → tarihsiz mod
+    if(harcamaYil>0&&!tumYillar.includes(harcamaYil)&&tumYillar.length>0) harcamaYil=tumYillar[0];
+
+    // Seçilen yılda kalemi olan harcamaları göster (harcama kartı her zaman görünür ama özet kalem bazlı)
+    const sirali=harcamalar.slice().sort((a,b)=>{
+      // Son kalem tarihine göre sırala
+      const son=h=>[...(h.kalemler||[])].map(k=>k.tarih||'').filter(Boolean).sort().reverse()[0]||h.tarih||'';
+      return son(b).localeCompare(son(a));
+    });
 
     // Kalem bazlı ödendi/bekleyen hesapla
     function harcamaBekleyenTutar(h){
@@ -3015,15 +3017,35 @@ function buildTakip(){
     html+=`<div style="margin-bottom:12px">
       <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none">
         ${tumYillar.length===0?`<div style="font-size:13px;color:var(--sub);padding:8px 0">Henüz harcama yok</div>`:''}
+        ${tumYillar.length>0?`<button onclick="harcamaYil=-1;harcamaAy=0;render()" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid ${harcamaYil===-1?cfg.renk:'var(--border)'};background:${harcamaYil===-1?cfg.renk:'var(--bg)'};color:${harcamaYil===-1?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Tümü</button>`:''}
         ${tumYillar.map(y=>`<button onclick="harcamaYil=${y};harcamaAy=0;render()" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid ${harcamaYil===y?cfg.renk:'var(--border)'};background:${harcamaYil===y?cfg.renk:'var(--bg)'};color:${harcamaYil===y?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">${y}</button>`).join('')}
+        <button onclick="harcamaYil=0;harcamaAy=0;render()" style="flex-shrink:0;padding:8px 16px;border-radius:20px;border:1.5px solid ${harcamaYil===0?cfg.renk:'var(--border)'};background:${harcamaYil===0?cfg.renk:'var(--bg)'};color:${harcamaYil===0?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Tarihsiz</button>
       </div>
 
     </div>`;
 
-    // Özet kart - ödendi/bekleyen ayrımıyla
+    // Özet kart - seçilen yıldaki kalemleri topla
     if(sirali.length>0){
-      const tumBekleyen=sirali.reduce((s,h)=>s+harcamaBekleyenTutar(h),0);
-      const tumOdendi=sirali.reduce((s,h)=>s+harcamaOdendiTutar(h),0);
+      let tumBekleyen=0, tumOdendi=0;
+      sirali.forEach(h=>{
+        (h.kalemler||[]).forEach(k=>{
+          if(harcamaYil===0){
+            if(k.tarih) return; // sadece tarihi olmayanlar
+          } else if(harcamaYil===-1){
+            // Tümü: hepsi dahil
+          } else {
+            if(k.tarih&&parseInt(k.tarih.slice(0,4))!==harcamaYil) return;
+            if(!k.tarih) return;
+          }
+          if(k.odendi) tumOdendi+=(k.tutar||0);
+          else tumBekleyen+=(k.tutar||0);
+        });
+        // Kalemi olmayan harcamalar
+        if(!h.kalemler||!h.kalemler.length){
+          if(harcamaYil===-1) tumBekleyen+=(h.tutar||0);
+          else if(harcamaYil!==0&&h.tarih&&parseInt(h.tarih.slice(0,4))===harcamaYil) tumBekleyen+=(h.tutar||0);
+        }
+      });
       const toplamTutar=tumBekleyen+tumOdendi;
       html+=`<div style="background:linear-gradient(135deg,${cfg.renk}18,${cfg.renk}08);border:1.5px solid ${cfg.renk}30;border-radius:16px;padding:14px;margin-bottom:16px">
         <div style="display:flex;gap:0">
@@ -3043,35 +3065,45 @@ function buildTakip(){
       </div>`;
     }
 
-    // Filtre sekmeleri
-    const hepsi=sirali.length;
-    const bekSayı=sirali.filter(h=>!harcamaTamOdendi(h)).length;
-    const odSayı=sirali.filter(h=>harcamaTamOdendi(h)).length;
+    // Filtre sekmeleri - yıl bazlı kalem sayısı
+    // Seçilen yılda kalemi olan harcamaları filtrele
+    const yilliHarcamalar=sirali.filter(h=>{
+      if(harcamaYil===-1) return true; // tümü
+      if(harcamaYil===0) return (h.kalemler||[]).some(k=>!k.tarih); // tarihsiz
+      if(h.kalemler&&h.kalemler.length) return h.kalemler.some(k=>k.tarih&&parseInt(k.tarih.slice(0,4))===harcamaYil);
+      return h.tarih&&parseInt(h.tarih.slice(0,4))===harcamaYil;
+    });
+    const hepsi=yilliHarcamalar.length;
+    const bekSayı=yilliHarcamalar.filter(h=>!harcamaTamOdendi(h)).length;
+    const odSayı=yilliHarcamalar.filter(h=>harcamaTamOdendi(h)).length;
     html+=`<div style="display:flex;background:var(--bg);border-radius:14px;padding:3px;gap:3px;border:1.5px solid var(--border);margin-bottom:16px">
       <button onclick="harcamaFiltre='tumu';render()" style="flex:1;padding:9px 4px;border-radius:11px;border:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:${harcamaFiltre==='tumu'?'var(--card)':'transparent'};color:${harcamaFiltre==='tumu'?'var(--text)':'var(--sub)'};box-shadow:${harcamaFiltre==='tumu'?'0 2px 8px rgba(0,0,0,.08)':'none'}">Tümü${hepsi?' · '+hepsi:''}</button>
       <button onclick="harcamaFiltre='bekleyen';render()" style="flex:1;padding:9px 4px;border-radius:11px;border:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:${harcamaFiltre==='bekleyen'?'var(--card)':'transparent'};color:${harcamaFiltre==='bekleyen'?'#C84848':'var(--sub)'};box-shadow:${harcamaFiltre==='bekleyen'?'0 2px 8px rgba(0,0,0,.08)':'none'}">Bekleyen${bekSayı?' · '+bekSayı:''}</button>
       <button onclick="harcamaFiltre='odendi';render()" style="flex:1;padding:9px 4px;border-radius:11px;border:none;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:${harcamaFiltre==='odendi'?'var(--card)':'transparent'};color:${harcamaFiltre==='odendi'?'#4A9060':'var(--sub)'};box-shadow:${harcamaFiltre==='odendi'?'0 2px 8px rgba(0,0,0,.08)':'none'}">Ödendi${odSayı?' · '+odSayı:''}</button>
     </div>`;
 
-    const gosterilen=harcamaFiltre==='bekleyen'?sirali.filter(h=>!harcamaTamOdendi(h)):harcamaFiltre==='odendi'?sirali.filter(h=>harcamaTamOdendi(h)):sirali;
+    const gosterilen=harcamaFiltre==='bekleyen'?yilliHarcamalar.filter(h=>!harcamaTamOdendi(h)):harcamaFiltre==='odendi'?yilliHarcamalar.filter(h=>harcamaTamOdendi(h)):yilliHarcamalar;
 
     if(harcamalar.length===0){
       html+=`<div class="empty"><div class="empty-emoji">💸</div><div class="empty-title">Harcama kaydı yok</div><div class="empty-sub">+ ile büyük harcamalarını ekle</div></div>`;
-    } else if(sirali.length===0){
-      html+=`<div class="empty"><div class="empty-emoji">💸</div><div class="empty-title">${harcamaAy>0?AYLAR_TR[harcamaAy-1]+' '+harcamaYil:harcamaYil} için kayıt yok</div></div>`;
+    } else if(yilliHarcamalar.length===0){
+      html+=`<div class="empty"><div class="empty-emoji">💸</div><div class="empty-title">${harcamaYil===0?'Tarihsiz kalem yok':harcamaYil===-1?'Harcama yok':harcamaYil+' yılında kayıt yok'}</div></div>`;
     } else if(gosterilen.length===0){
       html+=`<div class="empty"><div class="empty-emoji">💸</div><div class="empty-title">${harcamaFiltre==='bekleyen'?'Bekleyen harcama yok':'Ödenmiş harcama yok'}</div></div>`;
     } else {
       gosterilen.forEach(h=>{
-          const _ht=harcamaTarih(h);
-          const gunStr=_ht?(()=>{const d=new Date(_ht+'T12:00:00');return d.getDate()+' '+['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][d.getMonth()];})():'';
-          const kalemler=h.kalemler&&h.kalemler.length?h.kalemler:[];
+          // Sadece seçilen yıla ait kalemleri say
+          const tumKalemler=h.kalemler&&h.kalemler.length?h.kalemler:[];
+          const kalemler=harcamaYil===-1?tumKalemler:harcamaYil===0?tumKalemler.filter(k=>!k.tarih):tumKalemler.filter(k=>k.tarih&&parseInt(k.tarih.slice(0,4))===harcamaYil);
           const bekDoviz={}, odDoviz={};
           kalemler.forEach(k=>{const d=k.doviz||'₺'; if(k.odendi) odDoviz[d]=(odDoviz[d]||0)+(k.tutar||0); else bekDoviz[d]=(bekDoviz[d]||0)+(k.tutar||0);});
-          const toplamTutar=kalemler.length?kalemler.reduce((s,k)=>s+(k.tutar||0),0):(h.tutar||0);
+          const toplamTutar=kalemler.reduce((s,k)=>s+(k.tutar||0),0);
           const bekStr=Object.entries(bekDoviz).filter(([,v])=>v>0).map(([d,v])=>`${v.toLocaleString('tr-TR')} ${d}`).join(' + ');
           const odStr=Object.entries(odDoviz).filter(([,v])=>v>0).map(([d,v])=>`${v.toLocaleString('tr-TR')} ${d}`).join(' + ');
-          const kartToplamStr=(bekStr||odStr)?[bekStr,odStr?`<span style="color:#4A9060;font-size:12px">✓ ${odStr}</span>`:''].filter(Boolean).join(' + '):(toplamTutar.toLocaleString('tr-TR')+' ₺');
+          const kartToplamStr=(bekStr||odStr)?[bekStr,odStr?`<span style="color:#4A9060;font-size:12px">✓ ${odStr}</span>`:''].filter(Boolean).join(' + '):(toplamTutar?toplamTutar.toLocaleString('tr-TR')+' ₺':'—');
+          // Kaç farklı yıla yayıldığını göster
+          const yillar=[...new Set(tumKalemler.map(k=>k.tarih?k.tarih.slice(0,4):null).filter(Boolean))].sort();
+          const yilStr=yillar.length>1?yillar[0]+'–'+yillar[yillar.length-1]:yillar[0]||'';
           html+=`<div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:14px;margin-bottom:8px">
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:42px;height:42px;border-radius:12px;background:${cfg.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">${h.emoji||'💸'}</div>
@@ -3082,6 +3114,7 @@ function buildTakip(){
 
                 </div>
                 ${h.not?`<div style="font-size:12px;color:var(--sub);margin-top:5px;font-style:italic">${esc(h.not)}</div>`:''}
+                ${yilStr?`<div style="font-size:11px;font-weight:600;color:var(--sub);margin-top:4px">📅 ${yilStr}${yillar.length>1?' · '+tumKalemler.length+' kalem':''}</div>`:''}
               </div>
               <div style="display:flex;gap:4px;flex-shrink:0">
                 <button onclick="harcamaAcKapat('${h.id}')" style="width:30px;height:30px;border-radius:8px;border:1.5px solid ${h.acik?cfg.renk:'var(--border)'};background:${h.acik?cfg.bg:'var(--bg)'};cursor:pointer;display:flex;align-items:center;justify-content:center">
@@ -3316,7 +3349,7 @@ function takipKartOdeme(o,today,cfg,periyot){
         return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
           <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
             <span style="font-size:12px;font-weight:600;color:var(--text)">${gunLblG}</span>
-            <button onclick="odemeGecmisDuzenle('${o.id}',${gi},'${g.tarih||''}')" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <button data-id="${o.id}" data-gi="${gi}" data-tarih="${g.tarih||''}" data-tutar="${g.tutar||0}" onclick="odemeGecmisDuzenle(this.dataset.id,parseInt(this.dataset.gi),this.dataset.tarih,parseFloat(this.dataset.tutar)||0)" style="width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
           </div>
@@ -3618,17 +3651,24 @@ function takipKaydet(){
   }
   takipForm=null;save();render();
 }
-function odemeGecmisDuzenle(id,idx,mevcutTarih){
+function odemeGecmisDuzenle(id,idx,mevcutTarih,mevcutTutar){
   // Küçük inline tarih düzenleme modalı göster
   const mevcut=mevcutTarih||new Date().toISOString().slice(0,10);
   // Mevcut modalı kapat, yeni modal aç
   const overlay=document.createElement('div');
   overlay.id='tarih-modal';
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px';
+  const mevcutTutar2=mevcutTutar||'';
   overlay.innerHTML=`
     <div style="background:#FDF8F4;border-radius:20px;padding:24px;width:100%;max-width:320px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="font-size:16px;font-weight:800;color:#3D1F0A;margin-bottom:16px">Tarihi Düzenle</div>
-      <input id="tarih-input" type="date" value="${mevcut}" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid #D8CEC4;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:#3D1F0A;background:#fff;margin-bottom:16px"/>
+      <div style="font-size:16px;font-weight:800;color:#3D1F0A;margin-bottom:18px">Kaydı Düzenle</div>
+      <div style="font-size:11px;font-weight:700;color:#7A6858;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Tutar</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <input id="tutar-input" type="text" inputmode="decimal" value="${mevcutTutar2}" placeholder="0" style="flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid #D8CEC4;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#3D1F0A;background:#fff"/>
+        <span style="font-size:16px;font-weight:800;color:#7A6858">₺</span>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#7A6858;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Tarih</div>
+      <input id="tarih-input" type="date" value="${mevcut}" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid #D8CEC4;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#3D1F0A;background:#fff;margin-bottom:18px"/>
       <div style="display:flex;gap:8px">
         <button onclick="document.getElementById('tarih-modal').remove()" style="flex:1;padding:11px;border-radius:12px;border:1.5px solid #D8CEC4;background:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#7A6858;cursor:pointer">İptal</button>
         <button onclick="odemeGecmisTarihKaydet('${id}',${idx})" style="flex:1;padding:11px;border-radius:12px;border:none;background:#C87828;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer">Kaydet</button>
@@ -3638,15 +3678,20 @@ function odemeGecmisDuzenle(id,idx,mevcutTarih){
   overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
 }
 function odemeGecmisTarihKaydet(id,idx){
-  const input=document.getElementById('tarih-input');
-  if(!input||!input.value){showToast('Tarih seç');return;}
+  const tarihInput=document.getElementById('tarih-input');
+  const tutarInput=document.getElementById('tutar-input');
+  if(!tarihInput||!tarihInput.value){showToast('Tarih seç');return;}
   const o=state.takip.odemeler.find(x=>x.id===id);
   if(!o||!o.gecmis||!o.gecmis[idx])return;
-  const yeniTarih=input.value;
+  const yeniTarih=tarihInput.value;
   o.gecmis[idx].tarih=yeniTarih;
   o.gecmis[idx].ay=yeniTarih.slice(0,7);
+  if(tutarInput&&tutarInput.value){
+    const yeniTutar=parseFloat(tutarInput.value.replace(',','.'));
+    if(!isNaN(yeniTutar)&&yeniTutar>0) o.gecmis[idx].tutar=yeniTutar;
+  }
   document.getElementById('tarih-modal')?.remove();
-  save();render();showToast('Tarih güncellendi ✓');
+  save();render();showToast('Güncellendi ✓');
 }
 function odemeGecmisSil(id,idx){
   const o=state.takip.odemeler.find(x=>x.id===id);
