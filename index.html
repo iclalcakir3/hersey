@@ -4,24 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<title>hersey</title>
-<link rel="manifest" href="data:application/json,{%22name%22:%22hersey%22,%22short_name%22:%22hersey%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F7F3EE%22,%22theme_color%22:%22%23F5A888%22}"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>HerŞey</title>
+<link rel="manifest" href="data:application/json,{%22name%22:%22HerŞey%22,%22short_name%22:%22HerŞey%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F5A888%22,%22theme_color%22:%22%23F5A888%22,%22icons%22:[{%22src%22:%22%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="hersey"/>
-<link id="favicon" rel="icon" type="image/png" href=""/>
-<script>
-(function(){
-  const c=document.createElement('canvas');
-  c.width=c.height=64;
-  const ctx=c.getContext('2d');
-  ctx.font='52px serif';
-  ctx.textBaseline='middle';
-  ctx.textAlign='center';
-  ctx.fillText('🐰',32,36);
-  document.getElementById('favicon').href=c.toDataURL('image/png');
-})();
-</script>
+<meta name="apple-mobile-web-app-title" content="HerŞey"/>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -806,7 +795,6 @@ function _ensureState(){
   if(!state.takip.abonelikler)state.takip.abonelikler=[];
   if(!state.takip.odemeler)state.takip.odemeler=[];
   if(!state.takip.harcamalar)state.takip.harcamalar=[];
-  if(!state.streakFreeze)state.streakFreeze={tokens:0,lastGranted:'',used:{}};
   if(!state.darkMode)state.darkMode='auto';
   // Egzersizleri sadece bir kere merge et (save() içinde değil)
   if(!state._egzMerged){
@@ -832,25 +820,6 @@ function applyDarkMode(){
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if((state.darkMode||"auto")==="auto")applyDarkMode();});
 
 // ── STREAK FREEZE ──
-function streakFreezeGrantHaftalik(){
-  if(!state.streakFreeze)state.streakFreeze={tokens:0,lastGranted:"",used:{}};
-  const buHafta=weekKey(todayStr());
-  if(state.streakFreeze.lastGranted!==buHafta){
-    state.streakFreeze.lastGranted=buHafta;
-    state.streakFreeze.tokens=Math.min((state.streakFreeze.tokens||0)+1,3);
-    save();
-  }
-}
-function streakFreezeKullan(hobId,tarih){
-  if(!state.streakFreeze||state.streakFreeze.tokens<=0){showToast("Freeze hakkin kalmadi");return;}
-  const key="freeze_"+hobId+"_"+tarih;
-  if(state.streakFreeze.used[key]){showToast("Bu gun zaten freeze kullanildi");return;}
-  state.streakFreeze.tokens--;
-  state.streakFreeze.used[key]=true;
-  if(!state.logs[hobId])state.logs[hobId]={};
-  if(!state.logs[hobId][tarih])state.logs[hobId][tarih]=1;
-  save();render();showToast("Streak korundu");
-}
 
 let cv="todo",fg="Tümü";
 // Son konumu geri yükle
@@ -865,7 +834,6 @@ let groupAcik={};
 let fs={name:"",emoji:"🌱",freq:{type:"daily",tpd:1,dpw:3},group:"",ci:0};
 let eid=null,eo=false,caid=null,tt=null,archOpen=false;
 let adimModalId=null;
-let menuAcikId=null;
 let duzenleAcik=false;
 let adimDuzenlemeIdx=null;
 let adimNotModalIdx=null;
@@ -880,7 +848,6 @@ let kiloYil=new Date().getFullYear();
 let todoVade='kisa';
 (function(){try{const pos=JSON.parse(sessionStorage.getItem('hersey_pos')||'{}');if(pos.todoVade)todoVade=pos.todoVade;}catch(e){}})();
 let todoForm=null;
-let todoEditId=null;
 let takipSekme='odeme';
 (function(){try{const pos=JSON.parse(sessionStorage.getItem('hersey_pos')||'{}');if(pos.takipSekme)takipSekme=pos.takipSekme;}catch(e){}})();
 let odemePeriyot='aylik';
@@ -889,7 +856,6 @@ let ozetAcikYil=null; // yıllık özet açık yıl
 let ozetAcikAy=null; // aylık özet seçili ay (1-12)
 let harcamaFiltre='tumu'; // tumu | bekleyen | odendi
 let harcamaYil=-1;
-let favAcik=false;
 let favDlg=false;
 let favArama="";
 let besinArama="";
@@ -900,8 +866,7 @@ let suHedefDlg=false; // hafta | ay | yil
 let suYil=new Date().getFullYear();
 let suAy=new Date().getMonth();
 let hedefDlg=false;
-let harcamaAy=0; // 0 = tüm yıl, 1-12 = ay
-let takipAbonelikPeriyot='aylik'; // aylik | yillik
+let harcamaAy=0; // 0 = tüm yıl, 1-12 = ay // aylik | yillik
 let takipForm=null;
 
 function render(){
@@ -1034,12 +999,6 @@ function updateNav(){
 }
 
 // Ortak dikey rail butonu
-function railBtn(view, label, svgPath, isActive){
-  return `<button onclick="setView('${view}')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:44px;height:56px;border-radius:12px;border:none;background:${isActive?"var(--card)":"transparent"};cursor:pointer;transition:all .15s;box-shadow:${isActive?"0 2px 8px rgba(0,0,0,.1)":"none"};color:${isActive?"var(--text)":"var(--sub)"};">
-    <span style="width:22px;height:22px;display:block;flex-shrink:0">${svgPath}</span>
-    <span style="font-size:8px;font-weight:700;font-family:'Nunito',sans-serif;line-height:1;text-align:center;white-space:nowrap">${label}</span>
-  </button>`;
-}
 
 // ── BUILD ──
 function buildApp(){
@@ -1155,9 +1114,6 @@ function buildTracker(){
         const mainTxt=isDone?(freq.tpd>1?`${cnt}/${freq.tpd}`:"✓"):isPartial?`${cnt}/${freq.tpd}`:"";
         const lbl=DAYS[dow(key)];const dayNum=key.slice(8);
         const isPast=key<td&&!isDone&&!isPartial;
-        const freezeUsed=state.streakFreeze&&state.streakFreeze.used&&state.streakFreeze.used['freeze_'+h.id+'_'+key];
-        const dotBg=freezeUsed?'#B0D8F8':bg;
-        return `<div class="week-dot ${isDone?"done":isPartial?"partial":""}" style="background:${dotBg};color:${txtColor}" onclick="toggleLog('${h.id}','${key}',${freq.tpd})" oncontextmenu="if(${isPast&&!isDone}){event.preventDefault();streakFreezeKullan('${h.id}','${key}');}"><span style="font-size:7px;font-weight:700;opacity:.75">${lbl}</span><span style="font-size:9px;font-weight:800">${freezeUsed?'❄':mainTxt||dayNum}</span></div>`;
       } else {
         const isDone2=getCount(h.id,key)>0;const bg2=isDone2?cardBg:cardBg+"60";
         const lbl2=DAYS[dow(key)];const dayNum2=key.slice(8);
@@ -1981,7 +1937,6 @@ function kiloKaydet(){
   else{state.kalori.kilo.push({ds,kg:v});state.kalori.kilo.sort((a,b)=>a.ds.localeCompare(b.ds));}
   kiloDlg=false;saveKalori();render();showToast('Kilo kaydedildi ✓');
 }
-function setBsv(v){bsv=v;render();}
 function hedefKaydet(){
   const v=parseInt(document.getElementById('hedef-inp')?.value);
   if(v&&v>0){state.kalori.hedef=v;saveKalori();showToast('Hedef güncellendi ✓');}
@@ -2305,8 +2260,6 @@ function buildAyarlar(){
       </button>`;
   const _adVal=(state.kullaniciAdi||'');
   const dmPref=state.darkMode||'auto';
-  const freezeTokens=(state.streakFreeze&&state.streakFreeze.tokens)||0;
-  streakFreezeGrantHaftalik();
   return `<div style="padding-top:8px">${girisBlok}
     <div style="font-size:13px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:12px">Profil</div>
     <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:14px 16px;margin-bottom:20px;display:flex;gap:10px;align-items:center">
@@ -2326,17 +2279,14 @@ function buildAyarlar(){
       </div>
     </div>
 
-    <div style="font-size:13px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:12px">Streak Freeze ❄️</div>
     <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:14px 16px;margin-bottom:20px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div>
           <div style="font-size:14px;font-weight:800;color:var(--text)">Mevcut Haklar</div>
           <div style="font-size:12px;font-weight:600;color:var(--sub);margin-top:2px">Haftada 1 hak otomatik kazanılır (maks. 3)</div>
         </div>
-        <div style="font-size:28px;font-weight:800;color:#4F90B8">${freezeTokens}</div>
       </div>
       <div style="display:flex;gap:4px">
-        ${[0,1,2].map(i=>`<div style="flex:1;height:8px;border-radius:100px;background:${i<freezeTokens?'#4F90B8':'var(--border)'}"></div>`).join('')}
       </div>
       <div style="font-size:11px;font-weight:600;color:var(--sub);margin-top:8px">Freeze kullanmak için alışkanlık listesinde kaçırılan bir güne uzun bas.</div>
     </div>
@@ -2547,10 +2497,6 @@ function addGroup(){
   const i=document.getElementById("ngi");const v=i?i.value.trim():"";
   if(!v)return;state.groups.push(v);save();showToast("Grup eklendi ✓");render();
 }
-function deleteGroup(g){
-  if(state.hobbies.filter(h=>!h.archived&&h.group===g).length){showToast("Önce hobiler taşınsın");return;}
-  state.groups=state.groups.filter(x=>x!==g);save();showToast("Silindi");render();
-}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 
 // ─────────────────────────────────────────────
@@ -2718,7 +2664,6 @@ function buildTodo(){
     sayilar[v]=state.todos.filter(t=>(t.vade||t.oncelik||'orta')===v&&!t.tamamlandi).length;
   });
 
-
   // Özet şerit
   const _RENK={kisa:'#C84848',orta:'#C87828',uzun:'#4A70B0'};
   const _BG={kisa:'#FAE8E8',orta:'#FAF0DC',uzun:'#E4EEF8'};
@@ -2731,7 +2676,6 @@ function buildTodo(){
       </button>
     `).join('')}
   </div>`;
-
 
   if(goruntule.length===0){
     html+=`<div class="empty">
@@ -2862,7 +2806,6 @@ function buildTakip(){
 
   const liste=cfg.liste||[];
 
-
   // ── ÖDEMELER ──
   if(takipSekme==='odeme'){
     // Sub-tabs: aylık / yıllık
@@ -2882,7 +2825,6 @@ function buildTakip(){
       });
     });
     const yillarSirali=Object.keys(yillikOzet).sort((a,b)=>b-a);
-
 
     html+=`<div style="display:flex;background:var(--bg);border-radius:14px;padding:3px;gap:3px;border:1.5px solid var(--border);margin-bottom:16px">
       <button onclick="odemePeriyot='aylik';render()" style="flex:1;padding:9px;border-radius:11px;border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:${odPeriyot==='aylik'?'var(--card)':'transparent'};color:${odPeriyot==='aylik'?'var(--text)':'var(--sub)'};box-shadow:${odPeriyot==='aylik'?'0 2px 8px rgba(0,0,0,.08)':'none'};transition:all .15s">📅 Aylık</button>
@@ -2954,8 +2896,6 @@ function buildTakip(){
       </div>`;
     }
 
-
-
     if(filtreliListe.length===0){
       html+=`<div class="empty"><div class="empty-emoji">💳</div><div class="empty-title">${odPeriyot==='aylik'?'Aylık ödeme yok':'Yıllık ödeme yok'}</div><div class="empty-sub">+ ile ekle</div></div>`;
     } else {
@@ -2995,22 +2935,9 @@ function buildTakip(){
       return son(b).localeCompare(son(a));
     });
 
-    // Kalem bazlı ödendi/bekleyen hesapla
-    function harcamaBekleyenTutar(h){
-      if(!h.kalemler||!h.kalemler.length) return h.tutar||0;
-      return h.kalemler.filter(k=>!k.odendi).reduce((s,k)=>s+(k.tutar||0),0);
-    }
-    function harcamaOdendiTutar(h){
-      if(!h.kalemler||!h.kalemler.length) return 0;
-      return h.kalemler.filter(k=>k.odendi).reduce((s,k)=>s+(k.tutar||0),0);
-    }
     function harcamaTamOdendi(h){
       if(!h.kalemler||!h.kalemler.length) return false;
       return h.kalemler.every(k=>k.odendi);
-    }
-    function harcamaHicOdenmedi(h){
-      if(!h.kalemler||!h.kalemler.length) return true;
-      return h.kalemler.every(k=>!k.odendi);
     }
 
     // Yıl seçici
@@ -3135,7 +3062,6 @@ function buildTakip(){
     }
   }
 
-
   // Form modal
   if(takipForm!==null){
     html+=buildTakipForm();
@@ -3163,13 +3089,6 @@ function todoSil(id){
   save();render();showToast('Silindi');
 }
 
-function istekToggle(id){
-  const t=(state.istekler||[]).find(x=>x.id===id);
-  if(!t)return;
-  t.tamamlandi=!t.tamamlandi;
-  save();render();
-}
-
 function todoAcKapat(id){
   const t=state.todos.find(x=>x.id===id);
   if(!t)return;
@@ -3194,29 +3113,9 @@ function istekSil(id){
   save();render();showToast('Silindi');
 }
 
-function setTodoVade(v){
-  todoVade=v;
-  // Sub-nav'ı güncelle (buton kaybolmasın diye setTimeout ile)
-  setTimeout(function(){render();},0);
-}
-
 function surezSil(id){
   state.surezler=(state.surezler||[]).filter(x=>x.id!==id);
   save();render();showToast('Silindi');
-}
-
-function todoToggle(id){
-  const t=(state.todos||[]).find(x=>x.id===id);if(!t)return;
-  t.tamamlandi=!t.tamamlandi;
-  t.tamamlandiTarih=t.tamamlandi?todayStr():null;
-  save();render();
-}
-
-function surezToggle(id){
-  const t=(state.surezler||[]).find(x=>x.id===id);
-  if(!t)return;
-  t.tamamlandi=!t.tamamlandi;
-  save();render();
 }
 
 function takipKartOdeme(o,today,cfg,periyot){
@@ -3400,16 +3299,6 @@ function takipKartOdeme(o,today,cfg,periyot){
     </div>
     ${istatPanel}
   </div>`;
-}
-
-function todoAltToggle(todoId,idx){
-  const t=state.todos.find(x=>x.id===todoId);
-  if(!t||!t.altMaddeler)return;
-  t.altMaddeler[idx].tamamlandi=!t.altMaddeler[idx].tamamlandi;
-  // Hepsi tamamlandıysa ana todo'yu da tamamla
-  if(t.altMaddeler.every(a=>a.tamamlandi))t.tamamlandi=true;
-  else t.tamamlandi=false;
-  save();render();
 }
 
 function todoKaydet(){
@@ -3800,7 +3689,6 @@ function takipToggleOdeme(id){
 
 _ensureState();
 applyDarkMode();
-streakFreezeGrantHaftalik();
 render();
 
 // ── PULL TO REFRESH (soft) ──
