@@ -771,6 +771,11 @@ const TUME_EGZERSIZLER=[
   {id:"e47",name:"Dumbbell Biceps Curl",kas:"Kol",tip:"agirlik"},{id:"e48",name:"Banded Lat Pulldown",kas:"Sırt",tip:"agirlik"},
   {id:"e49",name:"Dumbbell Skull Crusher",kas:"Kol",tip:"agirlik"},{id:"e50",name:"Dumbbell Overhead Press",kas:"Omuz",tip:"agirlik"},
   {id:"e51",name:"Dumbbell Front Raise",kas:"Omuz",tip:"agirlik"},
+  {id:"e52",name:"Aletli Pilates",kas:"Pilates",tip:"sure"},
+  {id:"e53",name:"Mat Pilates",kas:"Pilates",tip:"sure"},
+  {id:"e54",name:"Reformer Pilates",kas:"Pilates",tip:"sure"},
+  {id:"e55",name:"Yoga",kas:"Pilates",tip:"sure"},
+  {id:"e56",name:"Esneme",kas:"Pilates",tip:"sure"},
 ];
 // ── DEBOUNCED FIREBASE SAVE ──
 let _fbSaveTimer=null;
@@ -783,6 +788,12 @@ function _debouncedFbSave(){
 }
 
 function _ensureState(){
+  // Özel egzersizleri havuza yükle (session başında)
+  if(state.antrenman&&state.antrenman.egzersizler){
+    state.antrenman.egzersizler.forEach(eg=>{
+      if(!TUME_EGZERSIZLER.find(e=>e.id===eg.id)) TUME_EGZERSIZLER.push(eg);
+    });
+  }
   if(!state.todos)state.todos=[];
   if(!state.surezler)state.surezler=[];
   if(!state.antrenman)state.antrenman={program:[],gunluk:{},egzersizler:[]};
@@ -1114,7 +1125,7 @@ function buildTracker(){
         const txtColor=isDone?"#3D1F0A":isPartial?"#8A6000":"var(--sub)";
         const mainTxt=isDone?(freq.tpd>1?`${cnt}/${freq.tpd}`:"✓"):isPartial?`${cnt}/${freq.tpd}`:"";
         const lbl=DAYS[dow(key)];const dayNum=key.slice(8);
-        const isPast=key<td&&!isDone&&!isPartial;
+        return `<div class="week-dot ${isDone?"done":isPartial?"partial":""}" style="background:${bg};color:${txtColor}" onclick="toggleLog('${h.id}','${key}',${freq.tpd})"><span style="font-size:7px;font-weight:700;opacity:.75">${lbl}</span><span style="font-size:9px;font-weight:800">${mainTxt||dayNum}</span></div>`;
       } else {
         const isDone2=getCount(h.id,key)>0;const bg2=isDone2?cardBg:cardBg+"60";
         const lbl2=DAYS[dow(key)];const dayNum2=key.slice(8);
@@ -1973,17 +1984,19 @@ function buildAntrenman(){
         if(tip==="agirlik"){
           html+=`<div class="set-row">
             <div class="set-num">${si+1}</div>
-            <input class="set-input" type="number" placeholder="kg" value="${s.kg||""}" onchange="setUpdate('${td}',${ei},${si},'kg',this.value)" style="width:55px"/>
+            <input class="set-input" type="number" placeholder="-" value="${s.kg||""}" onchange="setUpdate('${td}',${ei},${si},'kg',this.value)" style="width:52px"/>
             <span style="font-size:12px;color:var(--sub);font-weight:600">kg</span>
-            <input class="set-input" type="number" placeholder="tekrar" value="${s.reps||""}" onchange="setUpdate('${td}',${ei},${si},'reps',this.value)" style="width:65px"/>
-            <span style="font-size:12px;color:var(--sub);font-weight:600">tekrar</span>
+            <input class="set-input" type="number" placeholder="-" value="${s.reps||''}" onchange="setUpdate('${td}',${ei},${si},'reps',this.value)" style="width:52px"/>
+            <span style="font-size:12px;color:var(--sub);font-weight:600">rep</span>
             <div class="set-done ${s.done?"done":""}" onclick="setDone('${td}',${ei},${si})">${s.done?"✓":"○"}</div>
           </div>`;
         } else {
           html+=`<div class="set-row">
             <div class="set-num">${si+1}</div>
-            <input class="set-input" type="number" placeholder="dk" value="${s.sure||""}" onchange="setUpdate('${td}',${ei},${si},'sure',this.value)" style="width:65px"/>
-            <span style="font-size:12px;color:var(--sub);font-weight:600">dakika</span>
+            <input class="set-input" type="number" placeholder="0" value="${s.sureDk||""}" onchange="setUpdate('${td}',${ei},${si},'sureDk',this.value)" style="width:52px"/>
+            <span style="font-size:12px;color:var(--sub);font-weight:600">dk</span>
+            <input class="set-input" type="number" placeholder="0" value="${s.sureSn||""}" onchange="setUpdate('${td}',${ei},${si},'sureSn',this.value)" style="width:52px"/>
+            <span style="font-size:12px;color:var(--sub);font-weight:600">sn</span>
             <div class="set-done ${s.done?"done":""}" onclick="setDone('${td}',${ei},${si})">${s.done?"✓":"○"}</div>
           </div>`;
         }
@@ -1991,11 +2004,37 @@ function buildAntrenman(){
       html+=`</div>`;
     });
 
-    html+=`<div style="margin-top:4px">
-      <div class="field-label" style="margin-bottom:8px">Egzersiz Ekle</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${TUME_EGZERSIZLER.map(e=>`<div class="fav-chip" onclick="egEkle('${td}','${e.id}')">${e.name} <span style="color:var(--sub);font-size:11px">${e.kas}</span></div>`).join("")}
+    // Programlar bölümü
+    if(!state.antrenman.programlar)state.antrenman.programlar=[];
+    const bugunProgramlar=state.antrenman.programlar;
+    html+=`<div style="margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.7px">Programlar</div>
+        <button onclick="cv='antrenman_program';render()" style="font-size:11px;font-weight:700;color:var(--sub);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif">Düzenle →</button>
       </div>
+      ${bugunProgramlar.length===0?`
+        <div style="background:var(--card);border-radius:14px;border:1.5px dashed var(--border);padding:20px;text-align:center">
+          <div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:8px">Henüz program yok</div>
+          <button onclick="cv='antrenman_program';render()" style="padding:8px 16px;border-radius:10px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">+ Program Oluştur</button>
+        </div>
+      `:`
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${bugunProgramlar.map((pg,gi)=>{
+            const egSayisi2=(pg.egzersizler||[]).length;
+            const ekliIds=(gun.egzersizler||[]).map(e=>e.id);
+            const yeniSayisi=(pg.egzersizler||[]).filter(item=>!ekliIds.includes(typeof item==='string'?item:item.id)).length;
+            return `<div style="background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:12px 14px;display:flex;align-items:center;gap:12px">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:800;color:var(--text)">${esc(pg.ad||'Program')}</div>
+                <div style="font-size:11px;font-weight:600;color:var(--sub);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${egSayisi2} egzersiz</div>
+              </div>
+              <button onclick="programUygula(${gi})" style="flex-shrink:0;padding:8px 14px;border-radius:10px;border:none;background:${yeniSayisi>0?'var(--text)':'var(--border)'};color:${yeniSayisi>0?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer">
+                ${yeniSayisi>0?'▶ Uygula':'✓ Eklendi'}
+              </button>
+            </div>`;
+          }).join('')}
+        </div>
+      `}
     </div>`;
   }
 
@@ -2012,12 +2051,13 @@ function buildAntrenman(){
       html+=`<div class="empty"><div class="empty-emoji">📋</div><div class="empty-title">Henüz program yok</div><div class="empty-sub">Yeni program oluştur</div></div>`;
     } else {
       programlar.forEach((pg,gi)=>{
-        const egListesi=(pg.egzersizler||[]).map(id=>TUME_EGZERSIZLER.find(e=>e.id===id)?.name||id).join(", ");
+        const egSayisi=(pg.egzersizler||[]).length;
         html+=`<div class="program-day">
           <div style="flex:1">
             <div style="font-size:14px;font-weight:800;color:var(--text)">${esc(pg.ad||'Program')}</div>
-            <div style="font-size:12px;font-weight:600;color:var(--sub);margin-top:2px">${egListesi||"Egzersiz eklenmedi"}</div>
+            <div style="font-size:12px;font-weight:600;color:var(--sub);margin-top:2px">${egSayisi>0?egSayisi+" egzersiz":"Egzersiz eklenmedi"}</div>
           </div>
+          <button onclick="programUygula(${gi})" style="padding:6px 12px;border-radius:10px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">▶ Uygula</button>
           <button class="icon-btn" onclick="programDuzenle(${gi})">✏️</button>
           <button class="icon-btn" onclick="programSil(${gi})" style="color:#C05040">🗑️</button>
         </div>`;
@@ -2034,12 +2074,86 @@ function buildAntrenman(){
             <button onclick="programDlg=null;render()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--sub)">✕</button>
           </div>
           <input id="prog-ad-inp" class="field-input" placeholder="Program adı..." value="${esc(pg.ad||'')}" oninput="state.antrenman.programlar[${gi}].ad=this.value;save()" style="margin-bottom:14px"/>
+          ${(pg.egzersizler||[]).length>0?`
+          <div style="margin-bottom:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Seçili Egzersizler (${pg.egzersizler.length})</div>
+            <div id="prog-sira-${gi}" style="display:flex;flex-direction:column;gap:4px">
+              ${(pg.egzersizler||[]).map((item,idx)=>{
+                const eid2=typeof item==='string'?item:item.id;
+                const eg=TUME_EGZERSIZLER.find(e=>e.id===eid2);
+                const sets=typeof item==='object'?item.sets||3:3;
+                const reps=typeof item==='object'?item.reps||10:10;
+                const tip=eg?.tip||'agirlik';
+                return `<div draggable="true"
+                  data-gi="${gi}" data-idx="${idx}"
+                  ondragstart="progDragStart(event)"
+                  ondragover="progDragOver(event)"
+                  ondrop="progDrop(event,${gi})"
+                  ondragend="progDragEnd(event)"
+                  style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-radius:10px;border:1px solid var(--border);cursor:grab;touch-action:none">
+                  <span style="font-size:14px;color:var(--sub);flex-shrink:0;cursor:grab">⠿</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:700;color:var(--text)">${eg?eg.name:eid2}</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">
+                      <input type="number" min="1" max="20" value="${sets}"
+                        data-gi="${gi}" data-idx="${idx}" data-field="sets"
+                        onchange="programEgGuncelle(parseInt(this.dataset.gi),parseInt(this.dataset.idx),'sets',parseInt(this.value)||3)"
+                        style="width:52px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;background:var(--bg);color:var(--text)"/>
+                      <span style="font-size:11px;color:var(--sub)">set</span>
+                      ${tip==='agirlik'?`
+                      <input type="number" min="1" max="100" value="${reps}"
+                        data-gi="${gi}" data-idx="${idx}" data-field="reps"
+                        onchange="programEgGuncelle(parseInt(this.dataset.gi),parseInt(this.dataset.idx),'reps',parseInt(this.value)||10)"
+                        style="width:52px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;background:var(--bg);color:var(--text)"/>
+                      <span style="font-size:11px;color:var(--sub)">tekrar</span>
+                      `:`
+                      <input type="number" min="0" max="300" value="${typeof item==='object'&&item.sureDk!=null?item.sureDk:0}"
+                        data-gi="${gi}" data-idx="${idx}" data-field="sureDk"
+                        onchange="programEgGuncelle(parseInt(this.dataset.gi),parseInt(this.dataset.idx),'sureDk',parseInt(this.value)||0)"
+                        style="width:52px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;background:var(--bg);color:var(--text)"/>
+                      <span style="font-size:11px;color:var(--sub)">dk</span>
+                      <input type="number" min="0" max="59" value="${typeof item==='object'&&item.sureSn!=null?item.sureSn:30}"
+                        data-gi="${gi}" data-idx="${idx}" data-field="sureSn"
+                        onchange="programEgGuncelle(parseInt(this.dataset.gi),parseInt(this.dataset.idx),'sureSn',parseInt(this.value)||0)"
+                        style="width:52px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;background:var(--bg);color:var(--text)"/>
+                      <span style="font-size:11px;color:var(--sub)">sn</span>
+                      `}
+                    </div>
+                  </div>
+                  <button data-gi="${gi}" data-idx="${idx}" onclick="programEgSil(parseInt(this.dataset.gi),parseInt(this.dataset.idx))" style="width:24px;height:24px;border-radius:6px;border:1px solid #F0C8C8;background:#FAE8E8;cursor:pointer;font-size:12px;color:#C84848;flex-shrink:0;display:flex;align-items:center;justify-content:center">✕</button>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`:''}
           <div style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px">Egzersiz Ekle</div>
+              <button onclick="yeniEgzersizDlg=!yeniEgzersizDlg;render()" style="font-size:11px;font-weight:700;color:var(--text);background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif">+ Yeni Egzersiz</button>
+            </div>
+            ${typeof yeniEgzersizDlg!=='undefined'&&yeniEgzersizDlg?`
+            <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px">
+              <input id="yeni-eg-ad" class="field-input" placeholder="Egzersiz adı..." style="margin-bottom:8px;font-size:13px"/>
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <select id="yeni-eg-kas" style="flex:1;padding:8px 10px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--text);outline:none">
+                  ${['Göğüs','Sırt','Omuz','Kol','Core','Bacak','Kardiyo','Pilates'].map(k=>`<option value="${k}">${k}</option>`).join('')}
+                </select>
+                <select id="yeni-eg-tip" style="flex:1;padding:8px 10px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--text);outline:none">
+                  <option value="agirlik">Ağırlık</option>
+                  <option value="sure">Süre</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button onclick="yeniEgzersizEkle()" style="flex:1;padding:8px;border-radius:10px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Ekle</button>
+                <button onclick="yeniEgzersizDlg=false;render()" style="padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer">İptal</button>
+              </div>
+            </div>
+            `:''}
             ${(()=>{
               const ustVucut=['Göğüs','Sırt','Omuz','Kol','Core'];
               const altVucut=['Bacak'];
               const kardiyo=['Kardiyo'];
-              const bolumler=[['Üst Vücut',ustVucut],['Alt Vücut',altVucut],['Kardiyo',kardiyo]];
+              const pilates=['Pilates'];
+              const bolumler=[['Üst Vücut',ustVucut],['Alt Vücut',altVucut],['Kardiyo',kardiyo],['Pilates & Esneme',pilates]];
               return bolumler.map(([bolumAd,kasGruplari])=>{
                 const bolumEgler=TUME_EGZERSIZLER.filter(e=>kasGruplari.includes(e.kas));
                 const kaslar=[...new Set(bolumEgler.map(e=>e.kas))];
@@ -2059,12 +2173,11 @@ function buildAntrenman(){
                       </div>
                       ${acik?`<div style="border-top:1px solid var(--border)">
                         ${egler.map(e=>{
-                          const sel=(pg.egzersizler||[]).includes(e.id);
-                          return `<div onclick="programlarToggle(${gi},'${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;background:${sel?`${COLORS[2].bg}`:'var(--card)'}">
-                            <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${sel?'#8898C8':'var(--border)'};background:${sel?'#8898C8':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                              ${sel?'<span style="color:white;font-size:11px;font-weight:800">✓</span>':''}
-                            </div>
-                            <span style="font-size:13px;font-weight:600;color:var(--text)">${e.name}</span>
+                          const kacKez=(pg.egzersizler||[]).filter(item=>(typeof item==='string'?item:item.id)===e.id).length;
+                          return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--card)">
+                            <span style="flex:1;font-size:13px;font-weight:600;color:var(--text)">${e.name}</span>
+                            ${kacKez>0?`<span style="font-size:11px;font-weight:700;color:#8898C8;background:#EEF0F8;padding:2px 7px;border-radius:6px">${kacKez}x</span>`:''}
+                            <button data-gi="${gi}" data-eid="${e.id}" onclick="programEgEkle(parseInt(this.dataset.gi),this.dataset.eid)" style="width:26px;height:26px;border-radius:7px;border:none;background:var(--text);color:white;font-size:16px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
                           </div>`;
                         }).join("")}
                       </div>`:''}
@@ -2112,23 +2225,6 @@ function buildAntrenman(){
       </div>
     </div>`;
 
-    const sayac={};
-    Object.values(state.antrenman.gunluk).forEach(g=>(g.egzersizler||[]).forEach(e=>{sayac[e.name]=(sayac[e.name]||0)+1;}));
-    const siralanmis=Object.entries(sayac).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    if(siralanmis.length){
-      const maxS=siralanmis[0][1];
-      html+=`<div class="ant-stat-card">
-        <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px">En Çok Yapılanlar</div>
-        ${siralanmis.map(([n,s])=>`
-        <div style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:700;color:var(--text)">${esc(n)}</span>
-            <span style="font-size:13px;font-weight:700;color:var(--sub)">${s}x</span>
-          </div>
-          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.round(s/maxS*100)}%;background:#A8D0E8"></div></div>
-        </div>`).join("")}
-      </div>`;
-    }
 
     const pr={};
     Object.values(state.antrenman.gunluk).forEach(g=>(g.egzersizler||[]).forEach(e=>{
@@ -2146,6 +2242,49 @@ function buildAntrenman(){
         </div>`).join("")}
       </div>`;
     }
+
+    // Geçmiş antrenmanlar listesi
+    const AYSK2=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+    const gecmisGunler=Object.keys(state.antrenman.gunluk)
+      .filter(d=>(state.antrenman.gunluk[d]?.egzersizler||[]).length>0)
+      .sort().reverse();
+
+    if(gecmisGunler.length>0){
+      html+=`<div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px">Geçmiş Antrenmanlar</div>`;
+      gecmisGunler.forEach(d=>{
+        const gGun=state.antrenman.gunluk[d];
+        const egList=gGun.egzersizler||[];
+        const toplamSet=egList.reduce((s,e)=>s+(e.sets||[]).length,0);
+        const tamamSet=egList.reduce((s,e)=>s+(e.sets||[]).filter(x=>x.done).length,0);
+        const tarihObj=new Date(d+'T12:00:00');
+        const tarihStr=tarihObj.getDate()+' '+AYSK2[tarihObj.getMonth()]+' '+tarihObj.getFullYear();
+        const acikMi=antGecmisAcik===d;
+        const bugun=d===td;
+        html+=`<div style="background:var(--card);border-radius:14px;border:1.5px solid ${bugun?'var(--accent)':'var(--border)'};margin-bottom:8px;overflow:hidden">
+          <div onclick="antGecmisAcik=antGecmisAcik==='${d}'?null:'${d}';render()" style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:800;color:var(--text)">${bugun?'Bugün':tarihStr}</div>
+              <div style="font-size:12px;font-weight:600;color:var(--sub);margin-top:2px">${egList.length} egzersiz · ${tamamSet}/${toplamSet} set tamamlandı</div>
+            </div>
+            ${!bugun?`<button onclick="event.stopPropagation();programdanBugune('${d}')" style="padding:5px 10px;border-radius:8px;border:none;background:var(--text);color:white;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">↻ Tekrarla</button>`:''}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform .2s;transform:rotate(${acikMi?180:0}deg)"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          ${acikMi?`<div style="border-top:1.5px solid var(--border);padding:10px 14px 12px">
+            ${egList.map(eg=>{
+              const tSet=(eg.sets||[]).filter(x=>x.done).length;
+              const topSet=(eg.sets||[]).length;
+              const maxKg=Math.max(...(eg.sets||[]).filter(s=>s.kg).map(s=>parseFloat(s.kg)),0);
+              return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
+                <div style="flex:1;font-size:13px;font-weight:700;color:var(--text)">${esc(eg.name)}</div>
+                <div style="font-size:12px;font-weight:600;color:var(--sub)">${tSet}/${topSet} set${maxKg>0?' · '+maxKg+'kg':''}</div>
+              </div>`;
+            }).join('')}
+          </div>`:''}
+        </div>`;
+      });
+    } else {
+      html+=`<div class="empty"><div class="empty-emoji">📊</div><div class="empty-title">Henüz antrenman yok</div></div>`;
+    }
   }
 
   return html;
@@ -2154,6 +2293,24 @@ function buildAntrenman(){
 let programDlg=null;
 let programAcikKaslar={};
 let programYeniDlg=false;
+let yeniEgzersizDlg=false;
+
+function yeniEgzersizEkle(){
+  const ad=document.getElementById('yeni-eg-ad')?.value?.trim();
+  const kas=document.getElementById('yeni-eg-kas')?.value||'Göğüs';
+  const tip=document.getElementById('yeni-eg-tip')?.value||'agirlik';
+  if(!ad){showToast('Egzersiz adı girin');return;}
+  // Havuza ekle (özel egzersizler state'e kaydedilir)
+  if(!state.antrenman.egzersizler)state.antrenman.egzersizler=[];
+  const id='ce_'+Date.now();
+  state.antrenman.egzersizler.push({id,name:ad,kas,tip});
+  // TUME_EGZERSIZLER'e de ekle (bu session için)
+  TUME_EGZERSIZLER.push({id,name:ad,kas,tip});
+  save();
+  yeniEgzersizDlg=false;
+  showToast(ad+' eklendi ✓');
+  render();
+}
 
 function programYeniAc(){programYeniDlg=true;render();}
 function programEkle(){
@@ -2178,6 +2335,89 @@ function programlarToggle(gi,eid2){
   if(idx>=0)arr.splice(idx,1);else arr.push(eid2);
   save();render();
 }
+function programEgEkle(gi,eid2){
+  if(!state.antrenman.programlar[gi])return;
+  if(!state.antrenman.programlar[gi].egzersizler)state.antrenman.programlar[gi].egzersizler=[];
+  const eg=TUME_EGZERSIZLER.find(e=>e.id===eid2);
+  state.antrenman.programlar[gi].egzersizler.push({id:eid2,sets:3,reps:eg?.tip==='agirlik'?10:null});
+  save();render();
+}
+function programEgGuncelle(gi,idx,field,val){
+  const arr=state.antrenman.programlar[gi]?.egzersizler;
+  if(!arr||!arr[idx])return;
+  if(typeof arr[idx]==='string') arr[idx]={id:arr[idx],sets:3,reps:10};
+  arr[idx][field]=val;
+  save();
+}
+let _dragIdx=null;
+function progDragStart(e){
+  _dragIdx=parseInt(e.currentTarget.dataset.idx);
+  e.currentTarget.style.opacity='0.4';
+}
+function progDragOver(e){e.preventDefault();}
+function progDragEnd(e){e.currentTarget.style.opacity='1';}
+function progDrop(e,gi){
+  e.preventDefault();
+  const toIdx=parseInt(e.currentTarget.dataset.idx);
+  if(_dragIdx===null||_dragIdx===toIdx)return;
+  const arr=state.antrenman.programlar[gi].egzersizler;
+  const [moved]=arr.splice(_dragIdx,1);
+  arr.splice(toIdx,0,moved);
+  _dragIdx=null;
+  save();render();
+}
+
+function programEgSil(gi,idx){
+  if(!state.antrenman.programlar[gi])return;
+  state.antrenman.programlar[gi].egzersizler.splice(idx,1);
+  save();render();
+}
+
+let antGecmisAcik = null;
+
+function programUygula(gi){
+  const pg=state.antrenman.programlar[gi];
+  if(!pg||!pg.egzersizler?.length){showToast('Programda egzersiz yok');return;}
+  const td=todayStr();
+  if(!state.antrenman.gunluk[td])state.antrenman.gunluk[td]={egzersizler:[]};
+  const mevcut=state.antrenman.gunluk[td].egzersizler.map(e=>e.id);
+  let eklenen=0;
+  pg.egzersizler.forEach(item=>{
+    const eid2=typeof item==='string'?item:item.id;
+    if(mevcut.includes(eid2))return; // zaten varsa ekleme
+    const eg=TUME_EGZERSIZLER.find(e=>e.id===eid2)||(state.antrenman.egzersizler||[]).find(e=>e.id===eid2);
+    if(!eg)return;
+    // Programdaki set/tekrar/süre bilgisini otomatik yükle
+    const pgSets=typeof item==='object'?item.sets||3:3;
+    const pgReps=typeof item==='object'?item.reps||null:null;
+    const pgSureDk=typeof item==='object'?item.sureDk||0:0;
+    const pgSureSn=typeof item==='object'?item.sureSn||0:0;
+    const setler=Array.from({length:pgSets},()=>({
+      kg:'', reps:pgReps||'', sureDk:pgSureDk||'', sureSn:pgSureSn||'', done:false
+    }));
+    state.antrenman.gunluk[td].egzersizler.push({...eg,sets:setler});
+    eklenen++;
+  });
+  save();cv='antrenman';render();
+  showToast(eklenen>0?`${eklenen} egzersiz eklendi ✓`:'Tüm egzersizler zaten eklendi');
+}
+
+function programdanBugune(kaynakDs){
+  const kaynak=state.antrenman.gunluk[kaynakDs];
+  if(!kaynak?.egzersizler?.length){showToast('Kayıt boş');return;}
+  const td=todayStr();
+  if(!state.antrenman.gunluk[td])state.antrenman.gunluk[td]={egzersizler:[]};
+  const mevcut=state.antrenman.gunluk[td].egzersizler.map(e=>e.id||e.name);
+  let eklenen=0;
+  kaynak.egzersizler.forEach(eg=>{
+    const key=eg.id||eg.name;
+    if(mevcut.includes(key))return;
+    state.antrenman.gunluk[td].egzersizler.push({...eg,sets:[]});
+    eklenen++;
+  });
+  save();render();
+  showToast(eklenen>0?`${eklenen} egzersiz eklendi ✓`:'Zaten ekli');
+}
 
 function egEkle(ds,eid2){
   const eg=(state.antrenman.egzersizler||[]).find(e=>e.id===eid2);if(!eg)return;
@@ -2192,7 +2432,8 @@ function egSil(ds,idx){
 function setEkle(ds,ei){
   const eg=state.antrenman.gunluk[ds]?.egzersizler[ei];if(!eg)return;
   if(!eg.sets)eg.sets=[];
-  eg.sets.push({kg:"",reps:"",sure:"",done:false});
+  if(eg.tip==='sure') eg.sets.push({sureDk:'',sureSn:'',done:false});
+  else eg.sets.push({kg:'',reps:'',done:false});
   save();render();
 }
 function setUpdate(ds,ei,si,field,val){
@@ -2278,18 +2519,6 @@ function buildAyarlar(){
           <button onclick="state.darkMode='${v}';save();applyDarkMode();render()" style="flex:1;padding:10px 4px;border-radius:12px;border:1.5px solid ${dmPref===v?'var(--accent)':'var(--border)'};background:${dmPref===v?'var(--accent)':'var(--bg)'};color:${dmPref===v?'white':'var(--sub)'};font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer">${lb}</button>
         `).join('')}
       </div>
-    </div>
-
-    <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:14px 16px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div>
-          <div style="font-size:14px;font-weight:800;color:var(--text)">Mevcut Haklar</div>
-          <div style="font-size:12px;font-weight:600;color:var(--sub);margin-top:2px">Haftada 1 hak otomatik kazanılır (maks. 3)</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:4px">
-      </div>
-      <div style="font-size:11px;font-weight:600;color:var(--sub);margin-top:8px">Freeze kullanmak için alışkanlık listesinde kaçırılan bir güne uzun bas.</div>
     </div>
 
     <div style="font-size:13px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:12px">Dışa Aktar</div>
