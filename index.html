@@ -19,7 +19,7 @@
 button{cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation;}
 button *{pointer-events:none;}
 button svg{pointer-events:none;display:block;}
-html{background:var(--header-bg);}body{background:var(--bg);}
+html{background:var(--accent);}body{background:var(--bg);}
 body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow-y:scroll;scrollbar-width:none;-ms-overflow-style:none;}body::-webkit-scrollbar{display:none;}
 
 :root{
@@ -56,7 +56,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
   --nav-bg:#0E1E30;
 }
 [data-theme="dark"] body{background:#0A1828;color:#E8EFF8;}
-[data-theme="dark"] html{background:var(--header-bg);}
+[data-theme="dark"] html{background:var(--accent);}
 [data-theme="dark"] .rail{background:var(--rail-bg,rgba(10,24,40,.97));border-top:1.5px solid var(--border);}
 [data-theme="dark"] .field-input{background:#162438;color:#D8EEFF;}
 [data-theme="dark"] .save-btn{background:#2878B8;}
@@ -93,7 +93,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
   border-top:1.5px solid var(--border);
   display:flex;flex-direction:row;align-items:flex-start;justify-content:space-around;
   padding:6px 4px 0;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
   z-index:99;
 }
 .rail-item{
@@ -109,7 +109,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
 .rail-lbl{font-size:9px;font-weight:800;color:inherit;letter-spacing:.3px;text-align:center;pointer-events:none;line-height:1;}
 
 /* Content */
-.content{padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 96px) 20px;max-width:100%;margin:0;}
+.content{padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 110px) 20px;max-width:100%;margin:0;}
 
 /* Section title */
 .section-title{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:14px;}
@@ -944,6 +944,7 @@ function updateNav(){
     else if(v==='todo_orta') isActive=cv==='todo'&&todoVade==='orta';
     else if(v==='todo_uzun') isActive=cv==='todo'&&todoVade==='uzun';
     else if(v==='todo_sureziz') isActive=cv==='todo'&&todoVade==='sureziz';
+    else if(v==='etkinlik') isActive=cv==='etkinlik';
     else if(v==='notlar') isActive=cv==='notlar';
     else if(v==='ayarlar') isActive=cv==='ayarlar';
     btn.classList.toggle('active',isActive);
