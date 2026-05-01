@@ -93,7 +93,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
   border-top:1.5px solid var(--border);
   display:flex;flex-direction:row;align-items:flex-start;justify-content:space-around;
   padding:6px 4px 0;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
   z-index:99;
 }
 .rail-item{
@@ -109,7 +109,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
 .rail-lbl{font-size:9px;font-weight:800;color:inherit;letter-spacing:.3px;text-align:center;pointer-events:none;line-height:1;}
 
 /* Content */
-.content{padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 80px) 20px;max-width:100%;margin:0;}
+.content{padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 96px) 20px;max-width:100%;margin:0;}
 
 /* Section title */
 .section-title{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:14px;}
@@ -814,7 +814,12 @@ function applyRenkTema(tema){
     tcMeta.setAttribute('content',hdrColor);
   }
   // html bg = header rengi (safe area üstü için)
-  document.documentElement.style.background=isDark?t.headerBgDark:t.headerBg;
+  // html bg = header'ın başlangıç rengi (status bar uyumu için düz renk)
+  const hdrStartColor=isDark?(t.headerBgDark.match(/#[A-Fa-f0-9]{6}/)||['#183058'])[0]:(t.headerBg.match(/#[A-Fa-f0-9]{6}/)||['#A8CCEA'])[0];
+  document.documentElement.style.background=hdrStartColor;
+  // theme-color meta güncelle
+  const tcm=document.getElementById('theme-color-meta');
+  if(tcm)tcm.setAttribute('content',hdrStartColor);
 }
 
 function hexToRgba(hex,a){
