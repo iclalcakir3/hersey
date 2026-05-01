@@ -91,7 +91,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border-top:1.5px solid var(--border);
-  display:flex;flex-direction:row;align-items:flex-start;justify-content:space-around;
+  display:flex;flex-direction:row;align-items:center;justify-content:space-around;
   padding:6px 4px 0;
   padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px);
   z-index:99;
@@ -1993,7 +1993,7 @@ render();
     if(indicator)return;
     indicator=document.createElement('div');
     indicator.id='ptr-indicator';
-    indicator.style.cssText='position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;z-index:999;transition:height .2s;background:#A8CCEA;';
+    indicator.style.cssText='position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;z-index:999;transition:height .2s;background:var(--header-bg);';
     indicator.innerHTML='<div style="display:flex;align-items:center;gap:8px;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;color:rgba(26,32,48,.65)"><svg id="ptr-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(26,48,80,.75)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .3s"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg><span id="ptr-txt">Yenilemek için çek</span></div>';
     document.body.appendChild(indicator);
   }
