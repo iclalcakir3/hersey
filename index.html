@@ -105,7 +105,7 @@ body{font-family:'Nunito',sans-serif;color:#1A2030;padding-bottom:150px;overflow
 }
 .rail-item svg{width:24px;height:24px;pointer-events:none;display:block;flex-shrink:0;}
 .rail-item.active{color:var(--accent);}
-.rail-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;pointer-events:none;}
+.rail-sep{width:1px;height:28px;background:var(--border);flex-shrink:0;pointer-events:none;align-self:center;margin:0 2px;}
 .rail-lbl{font-size:9px;font-weight:800;color:inherit;letter-spacing:.3px;text-align:center;pointer-events:none;line-height:1;}
 
 /* Content */
@@ -798,26 +798,15 @@ function applyRenkTema(tema){
   r.style.setProperty('--nav-bg',isDark?t.navBgDark:t.navBg);
   const bodyBg=isDark?t.bgDark:t.bg;
   document.body.style.background=bodyBg;
-  document.documentElement.style.background=bodyBg;
   // header yazı renkleri
   r.style.setProperty('--header-text', isDark?'#E8EFF8':'#1A2030');
   r.style.setProperty('--header-sub', isDark?'rgba(232,239,248,.6)':'rgba(26,32,48,.55)');
   // rail
   const railEl=document.getElementById('main-rail');
   if(railEl)railEl.style.background=isDark?hexToRgba(t.bgDark,0.97):hexToRgba(t.bg,0.97);
-  // theme-color meta — status bar rengi
-  const tcMeta=document.getElementById('theme-color-meta');
-  if(tcMeta){
-    const hdrColor=isDark
-      ?(t.headerBgDark.match(/#[A-Fa-f0-9]{6}/)||['#183058'])[0]
-      :(t.headerBg.match(/#[A-Fa-f0-9]{6}/)||['#A8CCEA'])[0];
-    tcMeta.setAttribute('content',hdrColor);
-  }
-  // html bg = header rengi (safe area üstü için)
-  // html bg = header'ın başlangıç rengi (status bar uyumu için düz renk)
+  // html bg + theme-color = header başlangıç rengi
   const hdrStartColor=isDark?(t.headerBgDark.match(/#[A-Fa-f0-9]{6}/)||['#183058'])[0]:(t.headerBg.match(/#[A-Fa-f0-9]{6}/)||['#A8CCEA'])[0];
   document.documentElement.style.background=hdrStartColor;
-  // theme-color meta güncelle
   const tcm=document.getElementById('theme-color-meta');
   if(tcm)tcm.setAttribute('content',hdrStartColor);
 }
